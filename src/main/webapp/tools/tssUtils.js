@@ -612,7 +612,7 @@ function moveTreeNode(tree, id, targetId, url) {
 		url : (url || URL_MOVE_NODE) + id + "/" + targetId,
 		onsuccess : function() {  				
 			var treeNode = tree.getTreeNodeById(id);
-			var parent   = tree.getTreeNodeById(targetId);
+			var parent   = tree.getTreeNodeById(targetId == '0' ? '_root' : targetId);
 			tree.moveTreeNode(treeNode, parent); // 移动树节点	
 
 			// 父节点停用则下溯

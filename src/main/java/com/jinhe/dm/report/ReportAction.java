@@ -42,7 +42,7 @@ public class ReportAction extends BaseActionSupport {
     public void getAllReportGroups(HttpServletResponse response) {
         List<?> list = reportService.getAllReportGroups();
         TreeEncoder treeEncoder = new TreeEncoder(list, new LevelTreeParser());
-        treeEncoder.setNeedRootNode(false);
+        treeEncoder.setNeedRootNode(true);
         print("SourceTree", treeEncoder);
     }
     

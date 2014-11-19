@@ -92,14 +92,14 @@ public class ReportServiceImpl implements ReportService {
 
     public List<Report> copy(Long reportId, Long groupId) {
         Report report = getReport(reportId);
-        Report group  = getReport(groupId);
+        Report reportGroup = getReport(groupId);
         
         reportDao.evict(report);
         report.setId(null);
         report.setParentId(groupId);
         report.setSeqNo(reportDao.getNextSeqNo(groupId));
  
-        if (ParamConstants.TRUE.equals(group.getDisabled())) {
+        if (reportGroup != null && ParamConstants.TRUE.equals(reportGroup.getDisabled())) {
             report.setDisabled(ParamConstants.TRUE); // 如果目标根节点是停用状态，则新复制出来的节点也为停用状态
         }
         
@@ -112,14 +112,15 @@ public class ReportServiceImpl implements ReportService {
 
     public void move(Long reportId, Long groupId) {
         List<Report> list  = reportDao.getChildrenById(reportId);
-        Report targetGroup = reportDao.getEntity(groupId);
+        Report reportGroup = reportDao.getEntity(groupId);
         for (Report temp : list) {
             if (temp.getId().equals(reportId)) { // 判断是否是移动节点（即被移动枝的根节点）
                 temp.setSeqNo(reportDao.getNextSeqNo(groupId));
                 temp.setParentId(groupId);
             }
             
-            if (ParamConstants.TRUE.equals(targetGroup.getDisabled())) {
+            // reportGroup有可能是“全部”节点
+            if (reportGroup != null && ParamConstants.TRUE.equals(reportGroup.getDisabled())) {
                 temp.setDisabled(ParamConstants.TRUE); // 如果目标根节点是停用状态，则所有新复制出来的节点也一律为停用状态
             }
             

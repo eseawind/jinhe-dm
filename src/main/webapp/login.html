@@ -27,13 +27,24 @@
 
 <SCRIPT LANGUAGE="JavaScript">
 <!--
+
+/*********************** 应用配置 开始 **********************************/
+ var 
+ 	indexPage = "index.html";    /* 登录成功后调整到的页面 */
+ 
+ function setSysTitle() {
+ 	$("#sys_title").html( "数据分析系统" );
+ }
+
+/*********************** 应用配置 END **********************************/
+
     URL_GET_USER_NAME = "getLoginInfo.in";
     URL_LOGIN = AUTH_PATH + "login.do";
 
     window.alert = _alert;
     
     window.onload = function() {
-    	$("#sys_title").html( "数据分析系统" );
+    	setSysTitle();
     	
 		var loginNameObj = $1("loginName");
 		var passwordObj  = $1("password");
@@ -42,6 +53,10 @@
              this.style.backgroundColor = "white";
         }
 
+        var defaultUserName = $.Cookie.getValue("iUserName");
+		if( defaultUserName ) {
+	        loginNameObj.value = defaultUserName;
+	    }
         loginNameObj.focus();
 
         var loginButton = $1("bt_login");
@@ -76,13 +91,14 @@
 			}
             $.ajax({
                 url: URL_GET_USER_NAME,
-                headers: {"appCode": FROMEWORK_CODE},
                 params:  {"loginName": value},
                 onexcption: function() {
                     loginNameObj.focus();
                 },
                 onresult: function(){
-                    loginNameObj.identifier = this.getNodeValue("ClassName");
+                    loginNameObj.identifier = this.getNodeValue("identifier");
+                    loginNameObj.randomKey  = this.getNodeValue("randomKey");
+
                     passwordObj.focus();
                 }
             });
@@ -90,9 +106,11 @@
     }
 
     var doLogin = function(loginNameObj, passwordObj) {
-        var loginName = loginNameObj.value;
-        var password   = passwordObj.value;
         var identifier = loginNameObj.identifier;
+    	var randomKey  = loginNameObj.randomKey;
+    	
+        var loginName  = loginNameObj.value;
+        var password   = passwordObj.value;
         
         if( "" == loginName ) {
             alert("请输入账号");
@@ -112,16 +130,16 @@
         $.ajax({
             url: URL_LOGIN,
             headers : {
-                "appCode": FROMEWORK_CODE, 
-                "loginName": loginName, 
-                "password": password, 
+                "loginName": $.encode(loginName, randomKey), 
+                "password": $.encode(password, randomKey), 
                 "identifier": identifier
             },
             onexception: function(errorMsg) {
                 passwordObj.focus();
             },
             onsuccess: function() {
-                location.href = "index.html"; // "index.html";
+                $.Cookie.setValue("iUserName", loginName);
+                location.href = indexPage;
             }
         });
     }
@@ -141,7 +159,7 @@
 </head>
 <body>
     <div id="login_box">
-        <h1 id="sys_title"></h1>
+        <h1 id="sys_title">Welcome</h1>
         <span>
             <input type="text" id="loginName" placeholder="请输入您的账号" />
         </span>

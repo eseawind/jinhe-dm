@@ -77,6 +77,7 @@ public class MailUtil {
 			html.append("</style>");
 			html.append("</head>");
 			html.append("<body>");
+			
 			if(data.size() > 100) {
 				html.append("<h1>详细见附件</h1>");
 			} else {
@@ -97,6 +98,7 @@ public class MailUtil {
 	        	}
 				html.append("</table>");
 			}
+			
 			html.append("</body>");
 			html.append("</html>");
 			

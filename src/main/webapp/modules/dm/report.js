@@ -264,8 +264,9 @@ function copyReportTo() {
 
     var params = {id:id, parentID: pId};
     popupTree(URL_GROUPS_TREE, "SourceTree", params, function(target) {
+    	var targetId = (target.id == '_root' ? '0' : target.id);
         $.ajax({
-            url : URL_COPY_SOURCE + id + "/" + target.id,
+            url : URL_COPY_SOURCE + id + "/" + targetId,
             onresult : function() { 
                 var xmlNode = this.getNodeValue(XML_SOURCE_TREE).querySelector("treeNode");
                 appendTreeNode(target.id, xmlNode);
@@ -282,7 +283,8 @@ function moveReport() {
 
     var params = {id:id, parentID: pId};
     popupTree(URL_GROUPS_TREE, "SourceTree", params, function(target) {
-        moveTreeNode(tree, id, target.id, URL_MOVE_SOURCE);
+    	var targetId = (target.id == '_root' ? '0' : target.id);
+        moveTreeNode(tree, id, targetId, URL_MOVE_SOURCE);
     });
 }		
 

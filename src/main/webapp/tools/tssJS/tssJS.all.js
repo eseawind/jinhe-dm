@@ -350,6 +350,29 @@
                 return (new Date()).getTime();
             },
 
+            // 对数据进行简单加密
+            encode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [];
+                for(var i=0, length = info.length; i < length; i++) {
+                    result.push( info.charCodeAt(i) ^ (key || 100) % 127 );
+                }
+
+                return result.join("X");
+            },
+
+            decode: function(info, key) {
+                if( info == null || typeof(info) != 'string') return "";
+
+                var result = [];
+                info.split("X").each(function(){
+                    result.push( String.fromCharCode(this ^ (key || 100) % 127) );
+                });
+
+                return result.join("");
+            },
+
             isIE: mc(/.net/),
             isChrome: mc(/\bchrome\b/),
             isWebKit: mc(/webkit/),
@@ -1745,6 +1768,11 @@
                 $("#bt_cancel").click(function() {
                     reloginBox.style.display = "none";
                 });
+                
+                var defaultUserName = $.Cookie.getValue("iUserName");
+                if( defaultUserName ) {
+                    $1("loginName").value = defaultUserName;
+                }
             }
 
             $(reloginBox).show(); // 显示登录框
@@ -1764,13 +1792,14 @@
                 
                 $.ajax({
                     url: "/" + CONTEXTPATH + "getLoginInfo.in",
-                    headers:{"appCode": FROMEWORK_CODE || 'TSS'},
                     params: {"loginName": value},
                     onexcption: function() {
                         loginNameObj.focus();
                     },
                     onresult: function(){
-                        loginNameObj.identifier = this.getNodeValue("ClassName");
+                        loginNameObj.identifier = this.getNodeValue("identifier");
+                        loginNameObj.randomKey  = this.getNodeValue("randomKey");
+                        
                         passwordObj.focus();
                     }
                 });
@@ -1789,6 +1818,8 @@
             
             var doLogin = function() {
                 var identifier = loginNameObj.identifier;
+                var randomKey  = loginNameObj.randomKey;
+
                 var loginName  = loginNameObj.value;
                 var password   = passwordObj.value;
                 
@@ -1807,8 +1838,8 @@
                     return;
                 } 
 
-                request.setHeader("loginName", loginName);
-                request.setHeader("password",  password);
+                request.setHeader("loginName", $.encode(loginName, randomKey));
+                request.setHeader("password",  $.encode(password, randomKey));
                 request.setHeader("identifier", identifier);
                 request.send();
                 $(reloginBox).hide();
@@ -4276,7 +4307,7 @@
     $.initGridToolBar = function(pageBar, pageInfo, callback) {
         pageBar.init = function() {
             this.innerHTML = ""; // 清空内容
-			this.callback = callback;
+            this.callback = callback;
 
             var totalpages = pageBar.getTotalPages();
             var curPage = pageBar.getCurrentPage();
@@ -4341,11 +4372,11 @@
         }
         
         pageBar.gotoPage = function(page) {
-			if( this.callback ) {
-				this.callback(page); // 转到指定页
-				$1("GridPageList").value = page;
-				pageInfo.setAttribute("currentpage", page);
-			}
+            if( this.callback ) {
+                this.callback(page); // 转到指定页
+                $1("GridPageList").value = page;
+                pageInfo.setAttribute("currentpage", page);
+            }
         }
         
         pageBar.init();
@@ -4515,14 +4546,16 @@
         };
 
         // 借助于stack. [{id:1, name:node1, children:[ {id:3, name:node3, children:[......]} ], xx:xx}, {id:2......}]
+        // array.unshift(x), 先进先出；array.push(x), 后进先出
         var loadJson = function(data) {
             var stack = [];
             var parents = {};
 
             data.each(function(i, nodeAttrs) {
-                stack.push(nodeAttrs);
+                stack.unshift(nodeAttrs);
             });
 
+            var current;
             while(stack.length > 0) {
                 current = stack.pop();
 
@@ -4531,9 +4564,9 @@
                     tThis.rootList.push(treeNode);
                 }
 
-                current.children.each(function(i, child) {
+                (current.children || []).each(function(i, child) {
                     child.parent = treeNode;
-                    stack.push(child);
+                    stack.unshift(child);
                 });
             }
         };
@@ -5076,6 +5109,7 @@
 
     return Tree;
 });
+
 
 
 ;(function ($, factory) {

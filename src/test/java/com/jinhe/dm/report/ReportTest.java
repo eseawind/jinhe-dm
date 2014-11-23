@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -12,6 +13,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.jinhe.dm.TxTestSupport;
 import com.jinhe.tss.framework.component.log.LogQueryCondition;
 import com.jinhe.tss.framework.component.log.LogService;
+import com.jinhe.tss.framework.component.param.Param;
+import com.jinhe.tss.framework.component.timer.SchedulerBean;
 import com.jinhe.tss.framework.persistence.pagequery.PageInfo;
 import com.jinhe.tss.framework.sso.context.Context;
 
@@ -64,6 +67,15 @@ public class ReportTest extends TxTestSupport {
         action.move(response, report1.getId(), group2.getId());
         
         action.getAllReport(response);
+        
+        // test report schedule
+        String jobConfig = "com.jinhe.dm.report.timer.ReportJob | 0 36 10 * * ? | " +
+        		report1.getId() + ":" + report1.getName() + ":pjjin@800best.com,BL00618:param1=1";
+        action.saveAsJobParam(response, report1.getId(), jobConfig);
+        
+        List<Param> list = paramService.getComboParam(SchedulerBean.TIMER_PARAM_CODE);
+        Assert.assertEquals(list.size(), 1);
+        // test report schedule end
         
         action.delete(response, report1.getId());
         action.getAllReport(response);

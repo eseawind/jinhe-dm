@@ -17,7 +17,10 @@ import com.jinhe.dm.Constants;
 import com.jinhe.dm.report.permission.ReportPermissionsFull;
 import com.jinhe.dm.report.permission.ReportResourceView;
 import com.jinhe.tss.framework.component.param.Param;
+import com.jinhe.tss.framework.component.param.ParamConstants;
 import com.jinhe.tss.framework.component.param.ParamManager;
+import com.jinhe.tss.framework.component.param.ParamService;
+import com.jinhe.tss.framework.component.timer.SchedulerBean;
 import com.jinhe.tss.framework.web.dispaly.tree.LevelTreeParser;
 import com.jinhe.tss.framework.web.dispaly.tree.TreeEncoder;
 import com.jinhe.tss.framework.web.dispaly.xform.XFormEncoder;
@@ -150,6 +153,45 @@ public class ReportAction extends BaseActionSupport {
                         ReportPermissionsFull.class.getName(), ReportResourceView.class);
 
         print("Operation", EasyUtils.list2Str(list));
+    }
+	
+	
+	@Autowired ParamService paramService;
+	
+	@RequestMapping(value = "/schedule", method = RequestMethod.POST)
+    public void saveAsJobParam(HttpServletResponse response, Long reportId, String configVal) {
+		Param jobParam = paramService.getParam(SchedulerBean.TIMER_PARAM_CODE);
+		if(jobParam == null) {
+			jobParam = new Param();
+			jobParam.setCode(SchedulerBean.TIMER_PARAM_CODE);
+			jobParam.setName("定时报表配置");
+			jobParam.setParentId(ParamConstants.DEFAULT_PARENT_ID);
+			jobParam.setType(ParamConstants.NORMAL_PARAM_TYPE);
+			jobParam.setModality(ParamConstants.COMBO_PARAM_MODE);
+	        paramService.saveParam(jobParam);
+    	}
+		
+		Param jobParamItem = null;
+		String jobCode = "ReportJob-" + reportId;
+		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
+		for(Param temp : jobParamItems) {
+			if(temp.getCode().equals(jobCode)) {
+				jobParamItem = temp;
+				break;
+			}
+		}
+		if(jobParamItem == null) {
+			jobParamItem = new Param();
+			jobParamItem.setText(jobCode);
+			jobParamItem.setName(reportService.getReport(reportId).getName());
+			jobParamItem.setParentId(jobParam.getId());
+			jobParamItem.setType(ParamConstants.ITEM_PARAM_TYPE);
+			jobParamItem.setModality(jobParam.getModality());
+		}
+		jobParamItem.setValue(configVal);
+        paramService.saveParam(jobParamItem);
+        
+        printSuccessMessage();
     }
 
 }

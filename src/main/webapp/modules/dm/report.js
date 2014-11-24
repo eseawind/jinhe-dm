@@ -22,6 +22,8 @@ URL_REPORT_DATA    = NO_AUTH_PATH + "display/";
 URL_REPORT_JSON    = NO_AUTH_PATH + "display/json/";
 URL_REPORT_EXPORT  = NO_AUTH_PATH + "display/export/";
 
+URL_REPORT_JOB     = NO_AUTH_PATH + "rp/schedule";
+
 if(IS_TEST) {
 	URL_SOURCE_TREE    = "data/SOURCE_TREE.xml?";
 	URL_GROUPS_TREE    = "data/GROUPS_TREE.xml?";
@@ -37,7 +39,9 @@ if(IS_TEST) {
 
 	URL_REPORT_DATA    = "data/REPORT_DATA.xml?";
 	URL_REPORT_JSON    = "data/REPORT_JSON.txt?";
-	URL_REPORT_EXPORT  = "data/_success.xml?";
+	URL_REPORT_EXPORT  = "data/_success.xml?";  
+
+	URL_REPORT_JOB     = "data/report_schedule.json";
 }
 
 /* 页面初始化 */
@@ -126,6 +130,12 @@ function initMenus() {
 		icon: ICON + "icon_service.gif",
 		visible:function() {return isReport() && !isTreeNodeDisabled() && getOperation("2");}
 	}
+	var item12 = {
+		label:"定时邮件",
+		callback:scheduleReport,
+		icon: ICON + "schedule.gif",
+		visible:function() {return isReport() && !isTreeNodeDisabled() && getOperation("2");}
+	}
 
 	var menu = new $.Menu();
 	menu.addItem(item1);
@@ -142,6 +152,7 @@ function initMenus() {
 	menu.addItem(item9);
 	menu.addSeparator();
 	menu.addItem(item11);
+	menu.addItem(item12);
 	
 	$1("tree").contextmenu = menu;
 }
@@ -500,6 +511,103 @@ function createQueryForm(treeID, paramConfig, callback) {
 	}
 	$1("btCloseSearchForm").onclick = function () {
 		$("#searchFormDiv").hide();
+	}
+}
+
+// ------------------------------------------------ 配置报表定时邮件 -----------------------------------------------
+
+function scheduleReport() {
+	var scheduleTemplate = [];
+	scheduleTemplate.push({'label':'定时规则', 'name':'scheduleRule', 'type':'String', 'nullable':'false', 'defaultValue':'0 0 12 * * ?'}); 
+	scheduleTemplate.push({'label':'收件人', 'name':'receiverEmails', 'type':'String', 'nullable':'false', 'width':"400px"}); 
+
+	var treeNode = getActiveTreeNode();
+	var paramConfig = $.parseJSON( (treeNode.getAttribute("param") || "").trim() ); 
+	if(paramConfig && paramConfig.length) {
+		paramConfig.each(function(i, param) {
+			var tmp = {};
+			tmp.label = "参数-" + param.label;
+			tmp.name = "param" + (i+1);
+			tmp.type = "String";
+			tmp.nullable = param.nullable;
+			tmp.defaultValue = param.defaultValue;
+			scheduleTemplate.push(tmp);
+		});
+	}
+
+	var scheduleForm;
+	$.ajax({
+		url: URL_REPORT_JOB,
+		method: "GET",
+		params: {"reportId": treeNode.id},
+		type: "json",
+		ondata: function() {
+			var scheduleInfo = this.getResponseJSON();
+			if(scheduleInfo && scheduleInfo.length >= 3) {
+				scheduleTemplate[0].defaultValue = scheduleInfo[1];
+
+				var jobInfo = scheduleInfo[2].split(":");
+				scheduleTemplate[1].defaultValue = jobInfo[2];
+
+				var defaultParamValues = jobInfo[3].split(",");
+				for (var i = 0; i < defaultParamValues.length; i++) {
+                    var keyValue = defaultParamValues[i].split("=");
+                    scheduleTemplate.each(function(n, item) {
+                    	if(item.name === keyValue[0]) {
+                    		item.defaultValue = keyValue[1];
+                    	}
+                    });
+                }
+			}	
+
+			scheduleForm = $.json2Form("scheduleForm", JSON.stringify(scheduleTemplate) );
+			$.cache.XmlDatas["scheduleFormXML"] = scheduleForm.template.sourceXML;
+
+			scheduleForm.reportId = treeNode.id;
+			scheduleForm.reportName = treeNode.name;
+
+			$1("receiverEmails").placeholder = "输入完整的邮件地址，多个地址以逗号分隔";
+		}
+	});
+
+	Element.show($1("scheduleFormDiv"));
+	$("#reportName2").html("报表【" + treeNode.name + "】定时邮件配置");
+	
+	$1("scheduleSave").onclick = function () { 
+		if( scheduleForm.checkForm() ) {
+			var scheduleFormXML = $.cache.XmlDatas["scheduleFormXML"];
+			var dataNode = scheduleFormXML.querySelector("data");
+			var fieldNodes = dataNode.querySelectorAll("row *");
+        
+	        var result = {};
+	        var paramsValue = [];
+	        $.each(fieldNodes, function(i, node) {
+	        	var value = $.XML.getText(node);
+	        	if(node.nodeName.indexOf("param") < 0) {
+	        		result[node.nodeName] = value;
+	        	} else {
+	        		paramsValue.push(node.nodeName + "=" + value);
+	        	}
+	        });
+
+	        var reportId = scheduleForm.reportId;
+	        var reportName = scheduleForm.reportName;
+	        var receiverEmails = result.receiverEmails.replace(/\，/g, ","); // 替换中文逗号及（空格 replace(/\s/g, ",")）
+			var configVal = result.scheduleRule + "|" + reportId + ":" + reportName + ":" + receiverEmails + ":" + paramsValue.join(",");
+			alert(configVal);
+
+			$.ajax({
+				url: URL_REPORT_JOB,
+				params: {"reportId": reportId, "configVal": configVal},
+				method: "POST",
+				onsuccess: function() {
+					closeScheduleForm();
+				}
+			});
+		}
+	}
+	$1("closeScheduleForm").onclick = function closeScheduleForm() {
+		$("#scheduleFormDiv").hide();
 	}
 }
 

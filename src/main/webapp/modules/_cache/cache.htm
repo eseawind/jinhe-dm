@@ -18,8 +18,6 @@
     border:1px solid #416371;
     width: 600px;    
     height: 320px;  
-    margin-left: 200px;
-    margin-top: 200px;
     padding: 10px;
 }
 
@@ -32,6 +30,10 @@
 	color:#FFFFFF; 
 	text-indent:15px; 
 	cursor:move; 
+}
+
+#cacheStrategyDiv .bt { 
+	margin:10px 0 0 20px;
 }
 
 #poolHitRate { left:60px; top:4px; font-weight:bold; }
@@ -52,16 +54,20 @@
 	URL_INIT_TREE    = NO_AUTH_PATH + "cache/list";
 	URL_INIT_GRID    = NO_AUTH_PATH + "cache/grid";
 	URL_CACHE_DETAIL = NO_AUTH_PATH + "cache/list/";
-	URL_VIEW_ITEM    = NO_AUTH_PATH + "cache/item";
+	URL_CACHE_EDIT   = NO_AUTH_PATH + "cache";
 	URL_CACHE_CLEAR  = NO_AUTH_PATH + "cache/release";
-	URL_CACHE_INIT   = NO_AUTH_PATH + "cache/init";	
+	URL_CACHE_INIT   = NO_AUTH_PATH + "cache/init/";
+	URL_POOLs_INIT   = NO_AUTH_PATH + "cache/init";
+	URL_VIEW_ITEM    = NO_AUTH_PATH + "cache/item";
 	
 	if(IS_TEST) {
 		URL_INIT_TREE    = "data/cache_tree.xml?";
 		URL_INIT_GRID    = "data/cache_grid.xml?";
 		URL_CACHE_DETAIL = "data/cache1.xml?";
+		URL_CACHE_EDIT   = "data/_success.xml?";
 		URL_CACHE_CLEAR  = "data/_success.xml?";
 		URL_CACHE_INIT   = "data/_success.xml?";
+		URL_POOLS_INIT   = "data/_success.xml?";
 		URL_VIEW_ITEM    = "data/item.xml?";
 	}	
 	 
@@ -142,7 +148,7 @@
 		var treeNode = getActiveTreeNode();
 		if ( treeNode ) {
 			$.ajax({
-				url : URL_CACHE_INIT + "/" + treeNode.id,
+				url : URL_CACHE_INIT + treeNode.id,
 				onsuccess : function() {
 					treeNode.setAttribute("released", "0");
 					showCachePools();
@@ -167,8 +173,8 @@
 
 	/*
 	 *	缓存池详细信息 
-	 *	参数：	string:page                 页码
-				boolean:showStrategy        false的话只刷新grid列表
+	 *	参数：	string: page                页码
+			boolean: justRefreshGrid    false的话只刷新grid列表
 	 */
 	function showCachePools(page, justRefreshGrid) {
 		var tree = $.T("tree");
@@ -178,6 +184,7 @@
 			onresult: function() {
 				var strategyXML = this.getNodeValue(XML_CACHE_STRATEGY);
 				if( strategyXML && !justRefreshGrid) {
+					$.cache.XmlDatas["currentCacheInfo"] = strategyXML;
 					$.F("cacheStrategy", strategyXML);
 				}
 
@@ -191,13 +198,17 @@
 				
 				//设置点击率
 				var hitRateData = this.getNodeValue(XML_HIT_RATE);
-				$("#poolHitRate").html("『 " + treeNode.name + "-命中率：" + hitRateData + " 』")
+				$("#poolHitRate")
+					.html("『 " + treeNode.name + "-命中率：" + hitRateData + " 』")
 					.click( function() {
-						var formObj = $1("cacheStrategyDiv");
-				        Element.show(formObj);
+						var $form = $("#cacheStrategyDiv");
+				        $form.css("display", "block").center(600, 320);
 
 				        $("#cacheStrategyClose").click( function() {
-				            $(formObj).hide();
+				            $form.hide();
+				        });
+				        $("#cacheStrategyEdit").click( function() {
+				            editCacheStrategy();
 				        });
 					});
 			}
@@ -249,6 +260,35 @@
 			}
 		});
 	}
+	
+	function editCacheStrategy() {
+		var cacheInfo = $.cache.XmlDatas["currentCacheInfo"];
+		var dataNode = cacheInfo.querySelector("data");
+		var fieldNodes = dataNode.querySelectorAll("row *");
+        
+        var result = {};
+        $.each(fieldNodes, function(i, node) {
+        	result[node.nodeName] = $.XML.getText(node);
+        });
+ 
+		var jsonData = JSON.stringify(result);
+		$.ajax({
+			url: URL_CACHE_EDIT,
+			method: "POST",
+			params:{"cacheCode": result.code , "jsonData":jsonData},
+			onsuccess: function() {
+				loadInitGrid();
+			}
+		});	
+	}
+	
+	// 加载存储在param表里的缓存池配置信息（暂时没用到，如果以后需要在界面上触发加载操作，可调用本方法）
+	function initPools() {
+		$.ajax({
+			url : URL_POOLS_INIT,
+			method : "POST"
+		});
+	}
 
 	window.onload = init;
 
@@ -293,8 +333,9 @@
   	<h2>
 		缓存策略
 	</h2><br/>
-    <Form:Box id="cacheStrategy" editable="true"></Form:Box>    
+    <Form:Box id="cacheStrategy"></Form:Box>    
     <div class="bt">
+        <input type="button" class="btWeak" value="修改" id="cacheStrategyEdit"/>
     	<input type="button" class="btStrong" value="隐藏" id="cacheStrategyClose"/>
      </div>
   </div>

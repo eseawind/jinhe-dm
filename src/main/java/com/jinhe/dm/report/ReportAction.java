@@ -12,10 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jinhe.dm.Constants;
 import com.jinhe.dm.report.permission.ReportPermissionsFull;
 import com.jinhe.dm.report.permission.ReportResourceView;
+import com.jinhe.dm.report.timer.ReportJob;
 import com.jinhe.tss.framework.component.param.Param;
 import com.jinhe.tss.framework.component.param.ParamConstants;
 import com.jinhe.tss.framework.component.param.ParamManager;
@@ -159,7 +161,7 @@ public class ReportAction extends BaseActionSupport {
 	@Autowired ParamService paramService;
 	
 	@RequestMapping(value = "/schedule", method = RequestMethod.POST)
-    public void saveAsJobParam(HttpServletResponse response, Long reportId, String configVal) {
+    public void saveJobParam(HttpServletResponse response, Long reportId, String configVal) {
 		Param jobParam = paramService.getParam(SchedulerBean.TIMER_PARAM_CODE);
 		if(jobParam == null) {
 			jobParam = new Param();
@@ -175,23 +177,38 @@ public class ReportAction extends BaseActionSupport {
 		String jobCode = "ReportJob-" + reportId;
 		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
 		for(Param temp : jobParamItems) {
-			if(temp.getCode().equals(jobCode)) {
+			if(temp.getDescription().equals(jobCode)) {
 				jobParamItem = temp;
 				break;
 			}
 		}
 		if(jobParamItem == null) {
 			jobParamItem = new Param();
-			jobParamItem.setText(jobCode);
-			jobParamItem.setName(reportService.getReport(reportId).getName());
+			jobParamItem.setText(reportService.getReport(reportId).getName());
+			jobParamItem.setDescription(jobCode);
 			jobParamItem.setParentId(jobParam.getId());
 			jobParamItem.setType(ParamConstants.ITEM_PARAM_TYPE);
 			jobParamItem.setModality(jobParam.getModality());
 		}
-		jobParamItem.setValue(configVal);
+		jobParamItem.setValue(ReportJob.class.getName() + " | " + configVal);
         paramService.saveParam(jobParamItem);
         
         printSuccessMessage();
     }
 
+	@RequestMapping(value = "/schedule", method = RequestMethod.GET)
+	@ResponseBody
+    public Object[] getJobParam(HttpServletResponse response, Long reportId) {
+		String jobCode = "ReportJob-" + reportId;
+		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
+		if(jobParamItems != null) {
+			for(Param temp : jobParamItems) {
+				if(temp.getDescription().equals(jobCode)) {
+					String value = temp.getValue();
+					return EasyUtils.split(value, "|");
+				}
+			}
+		}
+		return null;
+    }
 }

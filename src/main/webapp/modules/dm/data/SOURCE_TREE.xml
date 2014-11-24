@@ -15,7 +15,8 @@
 				</treeNode>
 				<treeNode icon="images/reportGroup.gif" type="0" id="12" parentId="0" name="测试分组2" disabled="0" _open="true">
 					<treeNode icon="images/report_0.gif" type="1" id="14" parentId="12" name="测试报表二" disabled="0" displayUri="../../404.html"/>
-					<treeNode icon="images/report_0.gif" type="1" id="16" parentId="12" name="测试报表四" disabled="0"/>
+					<treeNode icon="images/report_0.gif" type="1" id="16" parentId="12" name="测试报表四" disabled="0"
+						param="[{'label':'查询时间', 'type':'date', 'nullable':'false', 'defaultValue' : 'today-3'}, {'label':'操作人', 'type':'String', 'nullable':'false'}]"/>
 				</treeNode>
 			</treeNode>
 		</actionSet>

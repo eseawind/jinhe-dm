@@ -34,6 +34,7 @@
 				break;
 			case "date":
 				this.mode = "date";
+				this.width = "200px";
 				var defaultValue = this.defaultValue;
 				if( defaultValue && (/today[\s]*-/gi).test(defaultValue) ) {
 					var deltaDays = parseInt(defaultValue.split("-")[1]);
@@ -88,6 +89,7 @@
 								sEl.options[sEl.options.length] = createOption(value);
 							});
 							
+							// 如果下拉列表要求非空，则默认选中最后一个选项
 							if( fThis.nullable == "false" && sEl.options.length > 0) {
 								sEl.options[sEl.options.length - 1].selected = true;
 								sEl.onchange();
@@ -119,7 +121,7 @@
 	}
 
 	$.json2Form = function(formId, jsonTemplate, buttonBox) {
-		var infos = jsonTemplate ? eval(jsonTemplate) : [];
+		var infos = jsonTemplate ? $.parseJSON(jsonTemplate) : [];
 
 		var columns = [];
 		var layouts = [];

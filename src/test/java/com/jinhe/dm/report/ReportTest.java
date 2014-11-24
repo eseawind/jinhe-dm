@@ -69,12 +69,16 @@ public class ReportTest extends TxTestSupport {
         action.getAllReport(response);
         
         // test report schedule
-        String jobConfig = "com.jinhe.dm.report.timer.ReportJob | 0 36 10 * * ? | " +
-        		report1.getId() + ":" + report1.getName() + ":pjjin@800best.com,BL00618:param1=1";
-        action.saveAsJobParam(response, report1.getId(), jobConfig);
+        Long reportId = report1.getId();
+        String jobConfig = " 0 36 10 * * ? | " +
+        		reportId + ":" + report1.getName() + ":pjjin@800best.com,BL00618:param1=1";
+        action.saveJobParam(response, report1.getId(), jobConfig);
         
         List<Param> list = paramService.getComboParam(SchedulerBean.TIMER_PARAM_CODE);
         Assert.assertEquals(list.size(), 1);
+        
+        Object[] result = action.getJobParam(response, reportId);
+        Assert.assertEquals("0 36 10 * * ?", result[1].toString().trim());
         // test report schedule end
         
         action.delete(response, report1.getId());

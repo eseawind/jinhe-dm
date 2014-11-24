@@ -27,11 +27,11 @@
 				</TR>
 				<TR>
 					<TD valign="top"><label binding="script"/></TD>
-					<TD><textarea binding="script" style="width:95%;height:250px"/></TD>
+					<TD><textarea binding="script" style="width:99%;height:250px"/></TD>
 				</TR>
 				<TR>
 					<TD valign="top"><label binding="param"/></TD>
-					<TD><textarea binding="param" style="width:95%;height:100px"/></TD>
+					<TD><textarea binding="param" style="width:99%;height:100px"/></TD>
 				</TR>
 				<TR>
 					<TD><label binding="datasource"/></TD>
@@ -47,7 +47,7 @@
 					<createTime><![CDATA[2013-06-09 00:00:00.0]]></createTime>
 					<updateTime><![CDATA[2013-06-13 16:53:03.0]]></updateTime>
 					<seqNo><![CDATA[1]]></seqNo>
-					<param><![CDATA[仓库:Number,货主ID:Number:false,货物:String,库位:String]]></param>
+					<param><![CDATA[ [{'label':'查询日期', 'type':'date', 'nullable':'false', 'defaultValue':'today - 60'}] ]]></param>
 					<type><![CDATA[1]]></type>
 					<script><![CDATA[select sku.skucode SKU, sku.descrcn 产品名称, sku.skueancode EAN, l.locationcode as 库位, 
   t.qtyuom as 库存数量, t.qtyuseuom as 可用数量, t.qtyallocateduom as 分配量 

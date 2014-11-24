@@ -207,7 +207,7 @@
                 throw msg;
             },
 
-            // parseJSON把一个字符串变成JSON对象。
+            // parseJSON把一个字符串变成JSON对象。(注：JSON.parse要求数据必须用双引号，eval转换时则不分单、双引号)
             parseJSON: function(data) {
                 if (typeof data !== "string" || !data) {
                     return null;
@@ -218,7 +218,11 @@
 
                 // 原生JSON API。反序列化是JSON.stringify(object)
                 if (window.JSON && window.JSON.parse) {
-                    return window.JSON.parse(data);
+                    try {
+                        return window.JSON.parse(data);
+                    } catch(e) {
+                        return window.eval(data);
+                    }
                 }
 
                 // ... 大致地检查一下字符串合法性
@@ -1110,7 +1114,6 @@
 
 
 
-
 ;(function($){
     /*
      *  大数据显示进度
@@ -1161,29 +1164,34 @@
         show: function() {
             var pThis = this;
 
-            var graph = $1("progressBar");
+            var graph = $(".progressBar")[0];
             if(graph == null) {
                 graph = $.createElement("div", "progressBar");
-                $(graph).center(500, 50).css("width", "500px").css("color", "#fff").css("fontSize", "16px");
+                $(graph).center(500, 50).css("width", "600px").css("color", "#fff").css("fontSize", "16px").css("fontWeight", "bold");
 
                 var bar = $.createElement("div", "bar");
-                $(bar).css("display", "block").css("backgroundColor", "green").css("border", "1px solid #F8B3D0")
-                    .css("height", "25px").css("textAlign", "center").css("padding", "3px 0 0 0");     
+                $(bar).css("backgroundColor", "#e0f6c8").css("border", "1px solid #F8B3D0") ;  
+
+                var passBar = $.createElement("div", "passBar");
+                $(passBar).css("backgroundColor", "#009966").html("1212").css("textAlign", "center");    
+                
+                graph.appendChild(bar);
+                bar.appendChild(passBar);  
 
                 var info = $.createElement("span", "info");
-                $(info).html("剩余时间:<span'>1</span>秒").css("padding", "0 0 0 100px");
+                $(info).html("剩余时间: <span>1</span>秒").css("padding", "5px 0 0 120px").css("color", "grey").css("fontSize", "14px");
 
                 var cancel = $.createElement("span");
-                $(cancel).html("<a href='#'>取 消</a>").css("width", "50px").css("padding", "0 0 0 100px")
+                $(cancel).html("<a href='#'>取 消</a>").css("padding", "5px 0 0 80px").css("fontSize", "14px")
                     .click(function() { pThis.stop(); });
 
-                graph.appendChild(bar);
                 graph.appendChild(info);
                 graph.appendChild(cancel);
                 document.body.appendChild(graph);
             }
 
-            $(".bar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
+            // this.percent = Math.round(Math.random() * 100); // just for test
+            $(".passBar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
             $(".info span", graph).html(this.estimateTime); 
         },
 
@@ -1768,7 +1776,7 @@
                 $("#bt_cancel").click(function() {
                     reloginBox.style.display = "none";
                 });
-                
+
                 var defaultUserName = $.Cookie.getValue("iUserName");
                 if( defaultUserName ) {
                     $1("loginName").value = defaultUserName;
@@ -2471,7 +2479,7 @@
             nextMonth     : 'Next Month',
             months        : ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
             weekdays      : ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-            weekdaysShort : ['周日','周一','周二','周三','周四','周五','周六']
+            weekdaysShort : ['日','一','二','三','四','五','六']
         },
 
         // callback function

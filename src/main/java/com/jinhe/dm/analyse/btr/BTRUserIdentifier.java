@@ -22,7 +22,7 @@ public class BTRUserIdentifier extends BaseUserIdentifier {
     
     protected Logger log = Logger.getLogger(this.getClass());
     
-    ILoginService loginservice = (ILoginService) Global.getContext().getBean("LoginService");
+    ILoginService loginservice = (ILoginService) Global.getBean("LoginService");
     
     protected IOperator validate() throws UserIdentificationException {
         PasswordPassport passport = new PasswordPassport();
@@ -45,7 +45,7 @@ public class BTRUserIdentifier extends BaseUserIdentifier {
     boolean checkPWDInBTR(IPWDOperator operator, String password){
         log.debug("用户登陆时密码在主用户组中验证不通过，转向进行再次验证。");
         
-        BaseService btrService = (BaseService) Global.getContext().getBean("BaseService");
+        BaseService btrService = (BaseService) Global.getBean("BaseService");
         
         String loginName = operator.getLoginName();
         boolean result = btrService.login(loginName, password);

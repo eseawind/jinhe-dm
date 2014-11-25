@@ -19,8 +19,8 @@ import com.jinhe.tss.util.EasyUtils;
  */
 public class ReportJob extends AbstractJob {
 	
-	ReportService reportService = (ReportService) Global.getContext().getBean("ReportService");
-	ILoginService loginService  = (ILoginService) Global.getContext().getBean("LoginService");
+	ReportService reportService = (ReportService) Global.getBean("ReportService");
+	ILoginService loginService  = (ILoginService) Global.getBean("LoginService");
 
 	/* 
 	 * jobConfig的格式为

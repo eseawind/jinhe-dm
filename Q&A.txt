@@ -12,5 +12,6 @@
 1、更改portal/model下Logo图标（BTR 、WMS）  
   D:\project\TSS\jinhe-tss\webapp\src\main\webapp\modules\portal\model\portlet\portlet-23
   
-2、#class.name.IdentityGetter = com.jinhe.tss.um.sso.UMIdentityGetter
+2、TSS/webapp application.properties
+  #class.name.IdentityGetter = com.jinhe.tss.um.sso.UMIdentityGetter
    class.name.IdentityGetter = com.jinhe.tss.um.sso.othersystem.WmsIdentifyGetter

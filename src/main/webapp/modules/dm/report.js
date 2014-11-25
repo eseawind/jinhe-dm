@@ -22,7 +22,7 @@ URL_REPORT_DATA    = NO_AUTH_PATH + "display/";
 URL_REPORT_JSON    = NO_AUTH_PATH + "display/json/";
 URL_REPORT_EXPORT  = NO_AUTH_PATH + "display/export/";
 
-URL_REPORT_JOB     = NO_AUTH_PATH + "rp/schedule";
+URL_REPORT_JOB     = AUTH_PATH + "rp/schedule";
 
 if(IS_TEST) {
 	URL_SOURCE_TREE    = "data/SOURCE_TREE.xml?";
@@ -537,9 +537,8 @@ function scheduleReport() {
 
 	var scheduleForm;
 	$.ajax({
-		url: URL_REPORT_JOB,
+		url: URL_REPORT_JOB + "?reportId=" + treeNode.id,
 		method: "GET",
-		params: {"reportId": treeNode.id},
 		type: "json",
 		ondata: function() {
 			var scheduleInfo = this.getResponseJSON();
@@ -566,6 +565,7 @@ function scheduleReport() {
 			scheduleForm.reportId = treeNode.id;
 			scheduleForm.reportName = treeNode.name;
 
+			$1("scheduleRule").placeholder = "请参照下面列出的各种定时规则写法";
 			$1("receiverEmails").placeholder = "输入完整的邮件地址，多个地址以逗号分隔";
 		}
 	});
@@ -593,15 +593,14 @@ function scheduleReport() {
 	        var reportId = scheduleForm.reportId;
 	        var reportName = scheduleForm.reportName;
 	        var receiverEmails = result.receiverEmails.replace(/\，/g, ","); // 替换中文逗号及（空格 replace(/\s/g, ",")）
-			var configVal = result.scheduleRule + "|" + reportId + ":" + reportName + ":" + receiverEmails + ":" + paramsValue.join(",");
-			alert(configVal);
+			var configVal = result.scheduleRule + " | " + reportId + ":" + reportName + ":" + receiverEmails + ":" + paramsValue.join(",");
 
 			$.ajax({
 				url: URL_REPORT_JOB,
 				params: {"reportId": reportId, "configVal": configVal},
 				method: "POST",
 				onsuccess: function() {
-					closeScheduleForm();
+					$("#scheduleFormDiv").hide();
 				}
 			});
 		}

@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.jinhe.dm.Constants;
 import com.jinhe.dm.data.util.DataExport;
+import com.jinhe.tss.framework.component.param.ParamConfig;
 import com.jinhe.tss.framework.component.param.ParamManager;
 import com.jinhe.tss.framework.exception.BusinessException;
 
@@ -24,20 +25,24 @@ public class MailUtil {
 	
 	private static JavaMailSenderImpl mailSender;
 	
-	private static String MAIL_SERVER = "hzsmtp1.800best.com";
-	private static String SEND_FROM_EMAIL = "BtrBI@800best.com";
+	// 邮箱信息配置到参数管理里
+	public static String MAIL_SERVER = "email.server";   // "hzsmtp1.800best.com";
+	public static String SEND_FROM_EMAIL = "email.from"; // "BtrBI@800best.com"
 	
-	// TODO 邮箱信息配置到参数管理里
 	public static MailSender getMailSender() {
 		if(mailSender != null) {
 			return mailSender;
 		}
 		
 		mailSender = new JavaMailSenderImpl();
-		mailSender.setHost(MAIL_SERVER);
+		mailSender.setHost(ParamConfig.getAttribute(MAIL_SERVER));
 		mailSender.setPort(25);
 		
 		return mailSender;
+	}
+	
+	private static String getFromEmail() {
+		return ParamConfig.getAttribute(SEND_FROM_EMAIL);
 	}
 	
 	public void send(String subject, String text, String receiver[]) {
@@ -45,7 +50,7 @@ public class MailUtil {
 
 		try {
 			mail.setTo(receiver);
-			mail.setFrom(SEND_FROM_EMAIL); // 发送者,这里还可以另起Email别名，不用和xml里的username一致
+			mail.setFrom(getFromEmail()); // 发送者,这里还可以另起Email别名，不用和xml里的username一致
 			mail.setSubject(subject); // 主题
 			mail.setText(text);       // 邮件内容
 			getMailSender().send(mail);
@@ -63,7 +68,7 @@ public class MailUtil {
 			// 设置utf-8或GBK编码，否则邮件会有乱码
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, true, "utf-8");
 			messageHelper.setTo(receiver);   // 接受者
-			messageHelper.setFrom(SEND_FROM_EMAIL);  // 发送者
+			messageHelper.setFrom(getFromEmail());  // 发送者
 			messageHelper.setSubject("定时报表：" + title); // 主题
 			
 			// 邮件内容，注意加参数true

@@ -13,8 +13,8 @@ import com.jinhe.tss.um.service.ILoginService;
 
 public class BTRAfterLoginCustomizer implements ILoginCustomizer {
     
-    ILoginService loginSerivce = (ILoginService) Global.getContext().getBean("LoginService");
-    BaseService baseService = (BaseService) Global.getContext().getBean("BaseService");
+    ILoginService loginSerivce = (ILoginService) Global.getBean("LoginService");
+    BaseService baseService = (BaseService) Global.getBean("BaseService");
 
     public final static String USER_GROUPS_ID = "USER_GROUPS_ID";
     public final static String USER_GROUPS_NAME = "USER_GROUPS_NAME";

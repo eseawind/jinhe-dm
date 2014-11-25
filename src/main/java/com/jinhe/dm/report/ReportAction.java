@@ -166,7 +166,7 @@ public class ReportAction extends BaseActionSupport {
 		if(jobParam == null) {
 			jobParam = new Param();
 			jobParam.setCode(SchedulerBean.TIMER_PARAM_CODE);
-			jobParam.setName("定时报表配置");
+			jobParam.setName("定时配置");
 			jobParam.setParentId(ParamConstants.DEFAULT_PARENT_ID);
 			jobParam.setType(ParamConstants.NORMAL_PARAM_TYPE);
 			jobParam.setModality(ParamConstants.COMBO_PARAM_MODE);
@@ -184,7 +184,7 @@ public class ReportAction extends BaseActionSupport {
 		}
 		if(jobParamItem == null) {
 			jobParamItem = new Param();
-			jobParamItem.setText(reportService.getReport(reportId).getName());
+			jobParamItem.setText(reportService.getReport(reportId).getName() + "-" + reportId);
 			jobParamItem.setDescription(jobCode);
 			jobParamItem.setParentId(jobParam.getId());
 			jobParamItem.setType(ParamConstants.ITEM_PARAM_TYPE);

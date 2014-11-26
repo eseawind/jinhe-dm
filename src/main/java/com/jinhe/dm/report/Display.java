@@ -96,7 +96,11 @@ public class Display extends BaseActionSupport {
         
         String fileName = reportId + "-" + System.currentTimeMillis() + ".csv";
         String exportPath = ParamManager.getValue(Constants.TEMP_EXPORT_PATH).replace("\n", "") + "/" + fileName;
+       
+        // 先输出查询结果到服务端的导出文件中
         DataExport.exportCSV(exportPath, excutor.result, excutor.selectFields);
+        
+        // 下载上一步生成的附件
         DataExport.downloadFileByHttp(response, exportPath);
         
         outputAccessLog(reportId, "exportAsCSV", requestMap, start);

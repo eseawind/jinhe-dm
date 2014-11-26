@@ -16,6 +16,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import com.jinhe.dm.Constants;
 import com.jinhe.dm.data.sqlquery.AbstractExportSO;
 import com.jinhe.dm.data.sqlquery.AbstractVO;
@@ -24,6 +26,8 @@ import com.jinhe.tss.framework.exception.BusinessException;
 import com.jinhe.tss.util.EasyUtils;
 
 public class DataExport {
+	
+	static Logger log = Logger.getLogger(DataExport.class);
 	
 	/**
      * 将已经读取到缓存中的VOList分页展示给前台
@@ -174,6 +178,10 @@ public class DataExport {
      */
     public static void downloadFileByHttp(HttpServletResponse response, String sourceFilePath) {
         File sourceFile = new File(sourceFilePath);
+        if( !sourceFile.exists() ) {
+        	log.error("下载附件时，发现文件【" + sourceFilePath + "】不存在了！");
+        	return;
+        }
         
         response.reset();
         response.setCharacterEncoding("utf-8");
@@ -194,8 +202,10 @@ public class DataExport {
                 outStream.flush();
             }           
         } catch (IOException e) {
-            throw new RuntimeException("导出时发生IOException!!", e);
+            throw new BusinessException("导出时发生IO异常!", e);
         } finally {
+        	sourceFile.delete();  // 删除导出目录下面的临时文件
+        	
             try {
                 if(inStream != null){
                     inStream.close();
@@ -203,12 +213,9 @@ public class DataExport {
                 if(outStream != null){
                     outStream.close();
                 }
-                outStream.close();
             } catch (IOException e) {
-                throw new RuntimeException("导出时发生IOException!!", e);
+                throw new RuntimeException("导出完成后关闭流时发生IO异常", e);
             }           
         }
-        
-        sourceFile.delete();  // 删除资源文件夹下面的zip文件
     }
 }

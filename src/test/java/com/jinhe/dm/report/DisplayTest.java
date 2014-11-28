@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.jinhe.dm.TxTestSupport;
 import com.jinhe.tss.framework.sso.context.Context;
@@ -53,7 +54,7 @@ public class DisplayTest extends TxTestSupport {
         
         display.showAsJson(request, report1.getName());
         
-        display.exportAsCSV(request, response, reportId, 1, 0);
+        display.exportAsCSV(request, response, reportId, 1, 0); // 测试导出
         
         request = new MockHttpServletRequest();
         request.addParameter("param1", "0");
@@ -61,8 +62,28 @@ public class DisplayTest extends TxTestSupport {
         request.addParameter("param4", "2013/10/01 11:11:11");
         request.addParameter("param5", "report-1,report-1");
         display.showAsJson(request, report1.getName());
+        
+        
+        Report reportGruop = new Report();
+        reportGruop.setName("reportGruop1");
+        reportGruop.setParentId(Report.DEFAULT_PARENT_ID);
+        reportGruop.setType(Report.TYPE0);
+		action.saveReport(response, reportGruop );
+		
+		reportGruop = new Report();
+        reportGruop.setName("reportGruop2");
+        reportGruop.setParentId(Report.DEFAULT_PARENT_ID);
+        reportGruop.setType(Report.TYPE0);
+		action.saveReport(response, reportGruop );
+		
+		request = new MockHttpServletRequest();
+		request.addParameter("param1", "0");
+		request.addParameter("param2", "1");
+        request.addParameter("param3", "2013-10-01");
+        request.addParameter("param4", "2013/10/01 11:11:11");
+        request.addParameter("param5", "reportGruop1,reportGruop2");
+		display.exportAsCSV(request, new MockHttpServletResponse(), reportId, 1, 1); // 测试导出超阀值
     }
-    
     
     @Test
     public void testReportDisplayWithError() {        

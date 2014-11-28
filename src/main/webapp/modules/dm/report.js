@@ -384,7 +384,9 @@ function searchReport(treeID, download) {
 				}
 			});
 		}
-		$1("downloadFrame").setAttribute("src", URL_REPORT_EXPORT + treeID + "/1/0" + queryString);
+		
+		// 为防止一次性查询出太多数据导致OOM，限制每次最多只能导出50万行，超出则提示进行分批查询
+		$1("downloadFrame").setAttribute("src", URL_REPORT_EXPORT + treeID + "/1/500000" + queryString);
 		return;
 	}
  

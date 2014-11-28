@@ -1,6 +1,7 @@
 package com.jinhe.dm.report;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -93,12 +94,21 @@ public class Display extends BaseActionSupport {
     	long start = System.currentTimeMillis();
     	Map<String, String> requestMap = getRequestMap(request);
 		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId());
-        
-        String fileName = reportId + "-" + System.currentTimeMillis() + ".csv";
+		
+		String fileName = reportId + "-" + System.currentTimeMillis() + ".csv";
         String exportPath = ParamManager.getValue(Constants.TEMP_EXPORT_PATH).replace("\n", "") + "/" + fileName;
-       
-        // 先输出查询结果到服务端的导出文件中
-        DataExport.exportCSV(exportPath, excutor.result, excutor.selectFields);
+        
+        // 如果导出数据超过了pageSize（前台为导出设置的pageSize为50万），则不予导出并给与提示
+		if(pagesize > 0 && excutor.count > pagesize) {
+			List<Object[]> result = new ArrayList<Object[]>();
+			result.add(new Object[] {"您当前查询导出的数据有" + excutor.count + "行, 超过了单次能导出行数的上限【" + pagesize + "行】，请缩短你的查询范围，分批导出。"});
+			
+			DataExport.exportCSV(exportPath, result, Arrays.asList("result"));
+		}
+		else {
+			// 先输出查询结果到服务端的导出文件中
+	        DataExport.exportCSV(exportPath, excutor.result, excutor.selectFields);
+		}
         
         // 下载上一步生成的附件
         DataExport.downloadFileByHttp(response, exportPath);

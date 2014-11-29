@@ -12,12 +12,7 @@ public class ReportDaoImpl extends TreeSupportDao<Report> implements ReportDao {
 	public ReportDaoImpl() {
         super(Report.class);
     }
-	
-	public Report refreshReport(Report report) {
-    	super.update(report);
-        return report;
-    }
-    
+ 
 	public Report deleteReport(Report report) {
 		Long id = report.getId();
         List<Report> list = getChildrenById(id);

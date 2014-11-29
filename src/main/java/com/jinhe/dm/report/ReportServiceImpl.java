@@ -59,7 +59,7 @@ public class ReportServiceImpl implements ReportService {
             reportDao.create(report);
         }
         else {
-        	reportDao.refreshReport(report);
+        	reportDao.refreshEntity(report);
         }
         return report;
     }
@@ -124,7 +124,7 @@ public class ReportServiceImpl implements ReportService {
                 temp.setDisabled(ParamConstants.TRUE); // 如果目标根节点是停用状态，则所有新复制出来的节点也一律为停用状态
             }
             
-            reportDao.update(temp);
+            reportDao.moveEntity(temp);
         }
     }
     

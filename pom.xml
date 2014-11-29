@@ -496,7 +496,7 @@
 			<properties>
 				<log.level>debug</log.level>
 				<job.enable>true</job.enable>
-				<db.url>127.0.0.1:3306/dms</db.url>
+				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<environment>dev</environment>
 				<tomcat.url>localhost:8088</tomcat.url>
 			</properties>

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.jinhe.dm.Constants;
-import com.jinhe.dm.report.permission.ReportPermissionsFull;
-import com.jinhe.dm.report.permission.ReportResourceView;
+import com.jinhe.dm.report.permission.ReportPermission;
+import com.jinhe.dm.report.permission.ReportResource;
 import com.jinhe.dm.report.timer.ReportJob;
 import com.jinhe.tss.framework.component.param.Param;
 import com.jinhe.tss.framework.component.param.ParamConstants;
@@ -152,7 +152,7 @@ public class ReportAction extends BaseActionSupport {
 	@RequestMapping("/operations/{resourceId}")
     public void getOperations(HttpServletResponse response, @PathVariable("resourceId") Long resourceId) {
         List<String> list = PermissionHelper.getInstance().getOperationsByResource(resourceId,
-                        ReportPermissionsFull.class.getName(), ReportResourceView.class);
+                        ReportPermission.class.getName(), ReportResource.class);
 
         print("Operation", EasyUtils.list2Str(list));
     }

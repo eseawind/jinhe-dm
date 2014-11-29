@@ -13,7 +13,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.jinhe.dm.Constants;
-import com.jinhe.dm.report.permission.ReportResourceView;
+import com.jinhe.dm.report.permission.ReportResource;
 import com.jinhe.tss.framework.component.param.ParamConstants;
 import com.jinhe.tss.framework.component.param.ParamManager;
 import com.jinhe.tss.framework.persistence.entityaop.IDecodable;
@@ -182,7 +182,7 @@ public class Report extends OperateInfo implements IXForm, IDecodable, IResource
 
     public Class<?> getParentClass() {
         if(this.parentId.equals(DEFAULT_PARENT_ID)) {
-            return ReportResourceView.class;
+            return ReportResource.class;
         }
         return this.getClass();
     }

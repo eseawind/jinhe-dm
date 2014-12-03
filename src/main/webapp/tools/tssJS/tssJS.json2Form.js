@@ -20,9 +20,16 @@
 		this.jsonUrl = info.jsonUrl;
 		this.multiple = (info.multiple == "true") || false;
 		this.onchange = info.onchange;
-		this.width  = info.width || "250px";
+		this.width  = (info.width || "250px").trim();
 		this.height = info.height;	
 		this.defaultValue = info.defaultValue;
+
+		if( /^\d*$/.test(this.width) ) {
+			this.width += "px";
+		}
+		if( info.height && /^\d*$/.test(this.height.trim()) ) {
+			this.height = this.height.trim() + "px";
+		}
 
 		switch(this.type.toLowerCase()) {
 			case "number":

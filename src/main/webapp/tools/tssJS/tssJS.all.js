@@ -1849,6 +1849,7 @@
                 request.setHeader("loginName", $.encode(loginName, randomKey));
                 request.setHeader("password",  $.encode(password, randomKey));
                 request.setHeader("identifier", identifier);
+                request.setHeader("randomKey", randomKey);
                 request.send();
                 $(reloginBox).hide();
             }

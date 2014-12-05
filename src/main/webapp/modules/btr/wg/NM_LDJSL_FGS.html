@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>人员数据</title>
+	<title>录单及时率</title>
 
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/icon.css">
@@ -10,7 +10,7 @@
 
 	<script src="../../tools/easyui/jquery.min.js"></script>
 	<script src="../../tools/easyui/jquery.easyui.min.js"></script>
-
+	<script  src="../../tools/highcharts/highcharts.js"></script>
 	<script src="../../framework/core.js"></script>
 	<script src="../../framework/ajax.js"></script>
 	<script src="../../dm/common.js"></script>
@@ -32,7 +32,7 @@
         var globalValiable = window.parent.globalValiable;
         if(globalValiable && globalValiable.data) {
             //queryParams = globalValiable.queryParams;
-            //title = queryParams.param1 + '日 人员数据';
+            //title = queryParams.param1 + '日'+queryParams.param2 + '日全网录单及时率';
             show(globalValiable.data);
             return;
         }
@@ -42,14 +42,21 @@
         var centers = [];        
         var dayList = [];  
         var dataMap = {}; 
-		var dataMap2 = {};      
+		var dataMap2 = {}; 
+		//tubiao
+		var maxzqx = 0;
+        var totalWeight = 0;
+        var showDay =  [];
+        var weekday; 
+		var dataMap3 = {}; 
+		 //  
         for(var i = originData.length - 1; i >= 0 ; i--) {
-            var day = originData[i]["d"];
+            var day = originData[i]["日期"];
             if( !dayList.contains(day) ){
                 dayList.push(day);
             }
-            var center = originData[i]["name"];
-            var type = originData[i]["type"];
+            var center = originData[i]["分拨"];
+            var type = originData[i]["分拨"];
 
             if(dataMap[center] == null) {
                  dataMap[center] = [];                 
@@ -58,13 +65,51 @@
                  dataMap2[center] = [];                 
             }
 
-            var w = originData[i]["w"];
-			var r = originData[i]["r"];
+            var w = originData[i]["及时录单"];
+			var r = originData[i]["录单总数"];
            
             dataMap[center][day] = w;
 			dataMap2[center][day] = r;
             dataMap[center].type = type;
+			//tubiao
+			var zqx = originData[i]["及时率"];
+            
+            var date   = originData[i]["日期"];
+
+            weekday = "天一二三四五六".charAt(new Date(date).getDay());
+
+            if(dataMap3[center] == null) {
+                 dataMap3[center] = [];
+            }
+           
+            dataMap3[center].push(zqx*100);
+            maxzqx = Math.max(zqx, maxzqx);
+            totalWeight += zqx;
+			//
         }
+		
+		//tubiao
+		
+        var scaledata = 0;
+        if (maxzqx <=1) {
+            scaledata = 1;
+        }
+        else {
+            scaledata = 1;
+        }
+        var spaceData=scaledata / 5;
+
+        
+        var data3 = [];
+        for(var center in dataMap3) {
+            var temp = {};
+            temp.name = center;
+            temp.data = dataMap3[center];
+            data3.push(temp);
+        }
+       
+        var autoSize  = autoAdjustSize("container");
+		//
 
         var cHtml = [];  
         dayList.reverse();       
@@ -88,30 +133,31 @@
 		     for(var i = 0; i < dayList.length; i++) {
 		     	if(dataMap2[center][dayList[i]]==0)
 				{
-					row[dayList[i]]=0
+					row[dayList[i]]=(dataMap[center][dayList[i]] || 0)/(dataMap2[center][dayList[i]] || 1)*100
 				}
 				else
 				{
-					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/1000/(dataMap2[center][dayList[i]] || 1);
+					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/(dataMap2[center][dayList[i]] || 1)*100;
 				}
 		         
-		         if(i == dayList.length-1){
+		         if(i == dayList.length){
 					 if(k2==0){
 						 row[dayList[i]]=0
 					 }
 					 else
 					 {
-		         	row[dayList[i]] = k/k2;
+		         	row[dayList[i]] = k/k2*100;
 					 }
 		         }
 		         else{
-		         	k = k + (dataMap[center][dayList[i]] || 0)/1000;
+		         	k = k + (dataMap[center][dayList[i]] || 0);
 					k2 = k2 + (dataMap2[center][dayList[i]] || 0);
 		         }
 		     }
 
+
 		     //data.rows.push(row);
-		     if (center != '全网') {data.rows.push(row);} else{data.footer.push(row);};
+		     if (center != '分公司') {data.rows.push(row);} else{data.footer.push(row);};
 		     
 		}
 
@@ -122,7 +168,7 @@
         	var row = rows[i];
 	        row.id = i + 1;
 
-        	if(row.rank === "公司") {
+        	if(row.rank === "分公司") {
         		rank1.push(row);
         		row.state = "closed";
         	}
@@ -142,6 +188,62 @@
 		    animate: true,
 		    data: data
 		});
+		
+		//butiao
+		 $(function () {
+                $('#container').highcharts({
+                    title: {
+                        text: '录单及时率',
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: '',
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: dayList
+                    },
+                    yAxis: {
+						labels: {
+                			format: '{value}%',
+                			},
+					
+                        title: {
+                            text: '点击筛选分拨'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    credits:{                   //右边下标HighCharts.com去除  
+                        enabled:false  
+                    },
+                    chart: {
+                        height:autoSize[1],
+                        type: 'line'
+                    }, 
+                    exporting: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br>'+
+                    '录单及时率' +': '+ this.y +'%';
+            }
+
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'left',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: data3
+                });
+            }); 
+			//
     }
        
 
@@ -154,11 +256,15 @@
 	     
 
 	    function styler(value,row,index){
+			if(value<100){
 			return 'color:red;font-weight:bold;';
+			}
+			else
+			{return 'color:black;font-weight:bold;';}
 		}
 
 	    function formatter(value, row, index){
-			return formatMoney(value, 1);
+			return formatMoney(value, 1)+'%';
 		}
 
 		function formatMoney(s, n) {   
@@ -193,7 +299,7 @@
 		</div>
 
 		<div title="图表" style="padding: 10px">
-			<div id='canvasDiv'></div>
+			<div id='container'></div>
 		</div>
 
 	</div>

@@ -155,11 +155,14 @@
 	     
 
 	    function styler(value,row,index){
+			if(value<95){
 			return 'color:red;font-weight:bold;';
+			}
+			else{return 'color:black;font-weight:bold;'}
 		}
 
 	    function formatter(value, row, index){
-			return formatMoney(value, 1);
+			return formatMoney(value, 1)+'%';
 		}
 
 		function formatMoney(s, n) {   

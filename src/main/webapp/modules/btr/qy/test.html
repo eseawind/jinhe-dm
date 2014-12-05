@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>分拨货量蛋糕</title>
+ 
+    <script src="../../tools/echarts-2.0.4/doc/example/www2/js/echarts-plain.js"></script>
+    
+    <script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            title = '分拨货量';
+            show(globalValiable.data,queryParams.param1,queryParams.param2);
+            return;
+        }
+    } 
+
+	
+	function show(originData,subtitle,tit) {
+        var data = {};
+        data = [];
+		
+        for(var i = 0; i < originData.length; i++){
+            data.push({value: originData[i]["weight"],name: originData[i]["发件站"]});
+        }
+
+		var myChart = echarts.init(document.getElementById('main'));
+ 
+        var option = {
+    title : {
+        text: tit+'各站点货量占比',
+        textStyle:{fontSize:'24',fontFamily:'Microsoft YaHei'},
+        subtext: subtitle,
+        subtextStyle:{fontSize:'18',color: '#999999',fontFamily:'Microsoft YaHei'},
+        x:'left',
+        y:'top'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{b}:{c}<br/>占比:{d}%"
+    },
+    toolbox: {
+        show : false,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : false,
+    series : (function (){
+        var series = [];
+        for (var i = 0; i < 30; i++) {
+            series.push({
+                name:'各站点货量',
+                type:'pie',
+                itemStyle : {normal : {
+                    label : {show : i > 28},
+                    labelLine : {show : i > 28, length:20}
+                }},
+                radius : [i * 6 + 40, i * 6 + 43],
+                data:data
+            })
+        }
+        series[0].markPoint = {
+            symbol:'emptyCircle',
+            symbolSize:series[0].radius[0],
+            effect:{show:true,scaleSize:12,color:'rgba(250,225,50,0.8)',shadowBlur:10,period:30},
+            data:[{x:'50%',y:'50%'}]
+        };
+        return series;
+    })()
+};
+
+                    
+        myChart.setOption(option);
+	}
+    </script> 
+    
+</head>
+
+<body>
+
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+
+</body>
+</html>

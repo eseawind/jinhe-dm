@@ -24,6 +24,7 @@ import com.jinhe.tss.framework.component.param.ParamManager;
 import com.jinhe.tss.framework.component.param.ParamService;
 import com.jinhe.tss.framework.component.timer.SchedulerBean;
 import com.jinhe.tss.framework.web.dispaly.tree.LevelTreeParser;
+import com.jinhe.tss.framework.web.dispaly.tree.StrictLevelTreeParser;
 import com.jinhe.tss.framework.web.dispaly.tree.TreeEncoder;
 import com.jinhe.tss.framework.web.dispaly.xform.XFormEncoder;
 import com.jinhe.tss.framework.web.mvc.BaseActionSupport;
@@ -39,14 +40,14 @@ public class ReportAction extends BaseActionSupport {
     @RequestMapping("/all")
     public void getAllReport(HttpServletResponse response) {
         List<?> list = reportService.getAllReport();
-        TreeEncoder treeEncoder = new TreeEncoder(list, new LevelTreeParser());
+        TreeEncoder treeEncoder = new TreeEncoder(list, new StrictLevelTreeParser(Report.DEFAULT_PARENT_ID));
         print("SourceTree", treeEncoder);
     }
     
     @RequestMapping("/groups")
     public void getAllReportGroups(HttpServletResponse response) {
         List<?> list = reportService.getAllReportGroups();
-        TreeEncoder treeEncoder = new TreeEncoder(list, new LevelTreeParser());
+        TreeEncoder treeEncoder = new TreeEncoder(list, new StrictLevelTreeParser(Report.DEFAULT_PARENT_ID));
         treeEncoder.setNeedRootNode(true);
         print("SourceTree", treeEncoder);
     }

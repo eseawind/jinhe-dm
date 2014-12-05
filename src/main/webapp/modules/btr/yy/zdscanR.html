@@ -35,16 +35,21 @@
 		var scaledata=0;
 		
 		var datatype = 0;		
-
+		var j = 0;
 		for(var i = 0; i < originData.length; i++) {
 
 			var center = originData[i]["分拨"] ;
 			var datatype = Math.round(originData[i]["扫描率"]*100 );	
 
-			mindata = (mindata<datatype) ? mindata : datatype;
+			if((mindata>datatype)&&(datatype>10)) {
+					mindata = datatype;
+			}
 
-			labels[i] = center;
-			dataList[i] = {name: center, value: datatype, color:'#335996' };
+			if(datatype>10){
+				labels[j] = center;
+				dataList[j] = {name: center, value: datatype, color:'#335996' };
+				j+=1;
+			}		
 		}
 
 		scaledata = Math.floor(mindata / 10 ) * 10;

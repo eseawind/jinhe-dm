@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>人员数据</title>
+	<title>扫描率</title>
 
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/icon.css">
@@ -92,7 +92,7 @@
 				}
 				else
 				{
-					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/1000/(dataMap2[center][dayList[i]] || 1);
+					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/(dataMap2[center][dayList[i]] || 0)*100;
 				}
 		         
 		         if(i == dayList.length-1){
@@ -105,10 +105,11 @@
 					 }
 		         }
 		         else{
-		         	k = k + (dataMap[center][dayList[i]] || 0)/1000;
+		         	k = k + (dataMap[center][dayList[i]] || 0)*100;
 					k2 = k2 + (dataMap2[center][dayList[i]] || 0);
 		         }
 		     }
+
 
 		     //data.rows.push(row);
 		     if (center != '全网') {data.rows.push(row);} else{data.footer.push(row);};

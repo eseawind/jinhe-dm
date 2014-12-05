@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>人员数据</title>
+	<title>出发时效</title>
 
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/icon.css">
@@ -15,9 +15,8 @@
 	<script src="../../framework/ajax.js"></script>
 	<script src="../../dm/common.js"></script>
 
-
 	<script type="text/javascript">
-
+	
     Array.prototype.contains = function(obj) {  
         var i = this.length;  
         while (i--) {  
@@ -31,20 +30,20 @@
 	window.onload = function() {
         var globalValiable = window.parent.globalValiable;
         if(globalValiable && globalValiable.data) {
-            //queryParams = globalValiable.queryParams;
-            //title = queryParams.param1 + '日 人员数据';
+            queryParams = globalValiable.queryParams;
+            //title = queryParams.param1 + '日 问题件破损短少类型各省份占比';
+
             show(globalValiable.data);
             return;
         }
     } 
 	function show(originData) { 
-
         var centers = [];        
         var dayList = [];  
-        var dataMap = {}; 
-		var dataMap2 = {};      
+        var dataMap = {};  
+        var dataMap2 = {};      
         for(var i = originData.length - 1; i >= 0 ; i--) {
-            var day = originData[i]["d"];
+            var day = originData[i]["inday"];
             if( !dayList.contains(day) ){
                 dayList.push(day);
             }
@@ -54,22 +53,36 @@
             if(dataMap[center] == null) {
                  dataMap[center] = [];                 
             }
-			if(dataMap2[center] == null) {
+
+            if(dataMap2[center] == null) {
                  dataMap2[center] = [];                 
             }
 
-            var w = originData[i]["w"];
-			var r = originData[i]["r"];
+            var num = originData[i]["n"];
+            var tot = originData[i]["tn"];
            
-            dataMap[center][day] = w;
-			dataMap2[center][day] = r;
+            dataMap[center][day] = num;
+            dataMap2[center][day] = tot;
             dataMap[center].type = type;
+        }
+        
+        for(var center in dataMap){
+            for(var i=0;i<dayList.length;i++){
+                if(dataMap[center][dayList[i]] == undefined){
+                    dataMap[center][dayList[i]] = null;
+                }
+            }
         }
 
         var cHtml = [];  
         dayList.reverse();       
         for(var i=0; i < dayList.length; i++) {        	
-        	cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dayList[i] + '</th>');
+        	if (i<dayList.length-1){
+        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dayList[i] + '</th>');
+        	}
+        	else{
+        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + '累计</th>');
+        	}
         }
 		
 		$$("cityColumn").innerHTML = cHtml.join("\n");
@@ -82,31 +95,29 @@
 		for(var center in dataMap) {
 		     var row = {};
 		     var k = 0;
-			 var k2 = 0;
+		     var t = 0;
+		     var t1;
+		     var t2;
 		     row.name = center;
 		     row.rank = dataMap[center].type;		     
 		     for(var i = 0; i < dayList.length; i++) {
-		     	if(dataMap2[center][dayList[i]]==0)
-				{
-					row[dayList[i]]=0
-				}
-				else
-				{
-					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/1000/(dataMap2[center][dayList[i]] || 1);
-				}
-		         
+                if(dataMap[center][dayList[i]] == null){
+                    row[dayList[i]] = '';
+                    t1 = 0;
+                    t2 = 0;
+                }
+                else{
+                    row[dayList[i]] = dataMap[center][dayList[i]]/dataMap2[center][dayList[i]] || 0;
+                    t1 = (dataMap[center][dayList[i]] || 0);
+                    t2 = (dataMap2[center][dayList[i]] || 0);
+                }
+
 		         if(i == dayList.length-1){
-					 if(k2==0){
-						 row[dayList[i]]=0
-					 }
-					 else
-					 {
-		         	row[dayList[i]] = k/k2;
-					 }
+		         	row[dayList[i]] = k/t;
 		         }
 		         else{
-		         	k = k + (dataMap[center][dayList[i]] || 0)/1000;
-					k2 = k2 + (dataMap2[center][dayList[i]] || 0);
+		         	k = k + t1;
+		         	t = t + t2;
 		         }
 		     }
 
@@ -154,11 +165,24 @@
 	     
 
 	    function styler(value,row,index){
-			return 'color:red;font-weight:bold;';
+			if(value>=0.8){
+	    		return 'color:#389562;font-weight:bold;';
+	    	}
+	    	else if(value<0.6){
+	    		return 'color:#C70B25;font-weight:bold;';
+	    	}
+	    	else{
+	    		return 'color:#F28705;font-weight:bold;';
+	    	}
 		}
 
 	    function formatter(value, row, index){
-			return formatMoney(value, 1);
+            if(value == ''){
+                return value;
+            }
+            else{
+                return formatMoney(value*100, 1)+'%';
+            }
 		}
 
 		function formatMoney(s, n) {   

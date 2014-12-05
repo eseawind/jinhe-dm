@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>分拨VI建设</title>
+ 
+    <script src="../../tools/echarts-2.0.4/echarts-plain.js"></script>
+    
+    <script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            title = 'VI建设';
+            show(globalValiable.data,queryParams.param1);
+            return;
+        }
+    } 
+
+	
+	function show(originData,subtitle) {
+		var total = 0;
+		var datar = [];
+		var datar2 = [];
+		var datar3 = [];
+		var dataload = [];
+		var label = [];
+		var maxdata=0;
+		var scaledata=0;
+				
+		for(var i = 0; i < originData.length; i++) {
+			var brst = originData[i]["道路运输许可证"];
+			var brst2 = originData[i]["门头"];
+			var brst3 = originData[i]["车身"];
+			var load = originData[i]["彩铃"];
+			var routine = originData[i]["分拨"];
+			if (maxdata<load) {
+				maxdata=load
+			}
+			scaledata=Math.round(maxdata)*100  + 0;
+
+			total += brst*100;
+			datar[i] = brst*100;
+			datar2[i] = brst2*100;
+			datar3[i] = brst3*100;
+			dataload[i] = load*100;
+			label[i] = routine;
+		}
+
+		var myChart = echarts.init(document.getElementById('main'));
+		var dataStyle = { 
+    	normal: {
+        label : {
+            show: true,
+            //position: 'insidecenter',
+            formatter: '{c}%'
+        	}
+    		}
+		};
+ 
+        var option = {
+    backgroundColor:'#ffffff',
+    title : {
+        text: 'VI建设',
+        subtext:subtitle
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['道路运输许可证','门头','车身','彩铃']
+    },
+    toolbox: {
+        show : false,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    animation:false,
+    xAxis : [
+        {
+            type : 'category',
+            data :label
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+			axisLabel:{formatter:'{value} %'}
+        }
+    ],
+    series : 
+    	[
+        {	barGap:0,
+        	barCategoryGap:'30%',
+            name:'道路运输许可证',
+            type:'bar',
+            itemStyle: {                // 系列级个性化
+                normal: {
+                    borderWidth: 1,
+                    borderColor:'#0067A6',
+                    color: '#0067A6'
+                },
+                emphasis: {
+                    borderColor:'#0067A6',
+                    color: '#0067A6'
+                }
+            },
+            data:datar,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'门头',
+            type:'bar',
+            itemStyle: {                // 系列级个性化
+                normal: {
+                    borderWidth: 1,
+                    borderColor:'#008972',
+                    color: '#008972'
+                },
+                emphasis: {
+                    borderColor:'#008972',
+                    color: '#008972'
+                }
+            },
+            data:datar2,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'车身',
+            type:'bar',
+            itemStyle: {                // 系列级个性化
+                normal: {
+                    borderWidth: 1,
+                    borderColor:'#EFC028',
+                    color: '#EFC028'
+                },
+                emphasis: {
+                    borderColor:'#EFC028',
+                    color: '#EFC028'
+                }
+            },
+            data:datar3,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'彩铃',
+            type:'bar',
+            itemStyle: {                // 系列级个性化
+                normal: {
+                    borderWidth: 1,
+                    borderColor:'#F2572D',
+                    color: '#F2572D'
+                },
+                emphasis: {
+                    borderColor:'#F2572D',
+                    color: '#F2572D'
+                }
+            },
+            data:dataload,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        }
+    ]
+};
+                    
+        myChart.setOption(option);
+	}
+    </script> 
+    
+</head>
+
+<body>
+
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+
+</body>
+</html>

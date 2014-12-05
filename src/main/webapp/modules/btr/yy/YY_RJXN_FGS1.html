@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+   
+    <!-- ECharts单文件引入 -->
+   <script src="../../tools/echarts-2.0.4/echarts-plain.js"></script>
+   <link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../../dm/common.css">
+
+	<script src="../../tools/easyui/jquery.min.js"></script>
+	<script src="../../tools/easyui/jquery.easyui.min.js"></script>
+	<script  src="../../tools/highcharts/highcharts.js"></script>
+	<script src="../../framework/core.js"></script>
+	<script src="../../framework/ajax.js"></script>
+	<script src="../../dm/common.js"></script>
+    <script type="text/javascript">
+	window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            title = queryParams.param1 +'至' + queryParams.param2 + '日'  +queryParams.param4+'人均效能';
+            show(globalValiable.data,queryParams.param1);
+            return;
+        }
+    } 
+function show(originData) { 
+
+        var centers = [];        
+        var dayList = [];  
+        var dataMap = {}; 
+		var dataMap2 = {}; 
+		//tubiao
+		var maxzqx = 0;
+        var totalWeight = 0;
+        var showDay =  [];
+        var weekday; 
+		var dataMap3 = {}; 
+		 //  
+        for(var i = originData.length - 1; i >= 0 ; i--) {
+            var day = originData[i]["日期"];
+            if( !dayList.contains(day) ){
+                dayList.push(day);
+            }
+            var center = originData[i]["分拨"];
+            var type = originData[i]["分拨"];
+
+            if(dataMap[center] == null) {
+                 dataMap[center] = [];                 
+            }
+			if(dataMap2[center] == null) {
+                 dataMap2[center] = [];                 
+            }
+
+            var w = originData[i]["人均效能"];
+			//var r = originData[i]["录单总数"];
+           
+            dataMap[center][day] = w;
+			//dataMap2[center][day] = r;
+            dataMap[center].type = type;
+			//tubiao
+			var zqx = originData[i]["人均效能"];
+            
+            var date   = originData[i]["日期"];
+
+            weekday = "天一二三四五六".charAt(new Date(date).getDay());
+
+            if(dataMap3[center] == null) {
+                 dataMap3[center] = [];
+            }
+           
+            dataMap3[center].push(zqx);
+            maxzqx = Math.max(zqx, maxzqx);
+            totalWeight += zqx;
+			//
+        }
+		
+		//tubiao
+		
+       
+        
+        var data3 = [];
+        for(var center in dataMap3) {
+            var temp = {};
+            temp.name = center;
+            temp.data = dataMap3[center];
+            data3.push(temp);
+        }
+       
+        
+
+var myChart = echarts.init(document.getElementById('main'));
+option = {
+	title : {
+        text:''
+        
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show : true,
+        
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+	dataZoom : {
+        show : true,
+        realtime : true,
+        start : 20,
+        end : 80
+    },
+    calculable : true,
+    /*legend: {
+        data:['人均效能','人员','货量']
+    },*/
+    xAxis : [
+        {
+            type : 'category',
+            splitLine : {show : false},
+            data : label
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+			name:'人均效能',
+			namelocation:'end',
+            position: 'left'
+	
+        }	 
+    ],
+    series : [
+        {
+            name:'人均效能',
+            type:'bar',
+            data:datamap3,
+			markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        }      
+    ]
+};           
+   myChart.setOption(option); 
+      
+                    
+	}
+
+    </script>
+</body>

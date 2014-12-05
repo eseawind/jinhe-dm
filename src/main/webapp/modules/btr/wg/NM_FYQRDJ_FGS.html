@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>费用确认登记</title>
+	<link rel="stylesheet" type="text/css" href="../../dm/common.css">
+	<script type="text/javascript" src="../../framework/core.js"></script>
+	<script type="text/javascript" src="../../framework/ajax.js"></script>
+	<script  src="../../tools/ichartjs/ichart.1.1.min.js"></script>
+	<script  src="../../dm/common.js"></script>
+	<script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            title = queryParams.param1 +'至' + queryParams.param2 + '日'+queryParams.param4+'费用确认登记情况';
+            show(globalValiable.data);
+            return;
+        }
+    } 
+
+	
+	function show(originData) {
+		var total = 0;
+		var dataW = [];
+		var dataDay = [];
+		var showDay = [];
+		var maxdata = 0;
+		var mindata = 100;
+		var maxDay = 0;
+		var minDay = 0;
+		var scaledata = 0;
+		var scaledata1 = 0;
+		var spaceData = 0;
+		var weekday;
+
+		for(var i = 0; i < originData.length; i++) {
+			var weight = originData[i]["比例"];
+			var dateIn = originData[i]["登记日期"];
+			weekday = "天一二三四五六".charAt(new Date(dateIn).getDay());
+			if (maxdata<weight) {
+				maxdata = weight;
+				maxDay = dateIn
+			}
+			if (mindata>weight) {
+				mindata = weight;
+				minDay = dateIn
+			}
+			scaledata=100;
+			if(Math.floor(mindata*10)*10<21)
+			{ scaledata1=0}
+			else{scaledata1=Math.floor(mindata*10)*10-20};
+
+			if (i % Math.round(originData.length/10) == 0){
+				showDay[i] = dateIn + '\n' + "星期" + weekday;
+			}
+			else{
+				showDay[i] = ' ';
+			}
+
+			total += weight*100;
+			dataW[i] = weight*100;
+			dataDay[i] = dateIn + '\n' + "星期" + weekday;
+		}
+
+		spaceData=(scaledata-scaledata1)/5;
+
+		var autoSize  = autoAdjustSize("canvasDiv");
+		$(function(){
+
+				var data = [
+
+				         	{
+
+				         		name : '比例',
+
+				         		value:dataW,
+
+				         		color:'#0d8ecf',
+
+				         		line_width:2
+
+				         	}
+
+				         ];
+
+		         
+
+				var labels =showDay;
+
+				
+
+				var line = new iChart.LineBasic2D({
+
+					render : 'canvasDiv',
+
+					data: data,
+					
+
+					align:'center',
+
+					title : {
+				text:title,
+				
+				font : '微软雅黑',
+				fontsize:18,
+				color:'#242424'
+			},
+			subtitle : {
+
+					text:'区间最大值:'+maxdata*100+'%'+'		区间最小值:'+mindata*100+'%',
+					align:'center',
+
+					color:'#afb6c0'
+
+				},
+					width :autoSize[0],
+
+					height : autoSize[1],
+					
+
+					sub_option:{
+
+						smooth : true,//平滑曲线
+
+						point_size:10,
+						listeners:{
+
+							parseText:function(r,t){
+
+								return t+"%";
+
+							}
+
+						}
+
+
+						
+
+					},
+
+					tip:{
+
+						enable:true,
+
+						shadow:true,
+						listeners:{
+
+						 //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+
+						parseText:function(tip,name,value,text,i){
+
+							return "<span style='color:#005268;font-size:12px;'>"+dataDay[i]+"比例:<br/>"+
+
+							"</span><span style='color:#005268;font-size:20px;'>"+value+"%</span>";
+
+						}
+
+					}
+
+
+
+					},
+
+					legend : {
+
+						enable : false
+
+					},
+
+					crosshair:{
+
+						enable:true,
+
+						line_color:'#62bce9'
+
+					},
+
+					coordinate:{
+
+						width:1000,
+
+						valid_width:800,
+
+						height:680,
+
+						axis:{
+
+							color:'#9f9f9f',
+
+							width:[0,0,2,2]
+
+						},
+
+						grids:{
+
+							vertical:{
+
+								way:'share_alike',
+
+						 		value:12
+
+							}
+
+						},
+
+						scale:[{
+
+							 position:'left',	
+
+							 start_scale:scaledata1,
+
+							 end_scale:scaledata,
+
+							 scale_space:spaceData,
+
+							 scale_size:2,
+
+							 scale_color:'#9f9f9f',
+							 listeners:{
+
+							parseText:function(t,x,y){
+
+								return {text:t+"%"}
+
+							}
+
+						}
+
+
+
+						},{
+
+							 position:'bottom',	
+
+							 labels:labels
+
+						}],
+						
+
+					}
+
+				});
+
+			//开始画图
+
+			line.draw();
+
+		});
+
+}
+	
+	
+	</script>
+</head>
+
+<body>
+	
+	<div id='canvasDiv'></div>
+
+</body>
+</html>

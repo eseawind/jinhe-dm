@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>网络班车及时性</title>
+ 
+    <script src="../../tools/echarts-2.0.4/echarts-plain.js"></script>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        var sub;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            sub = queryParams.param1 + '至' + queryParams.param2;
+            if(queryParams.param3 == 'timingo'){
+                show(globalValiable.data,sub,'发车及时率');
+            }
+            else if(queryParams.param3 == 'timingi'){
+                show(globalValiable.data,sub,'到达及时率');
+            }
+            else{
+                show(globalValiable.data,sub,'运行时效及时率');
+            }
+            return;
+        }
+    } 
+
+    function show(originData,subtit,tit) {
+        var data = [];
+        var dataday = [];
+        var maxr = 0;
+        var minr = 100;
+
+        for(var i = 0; i < originData.length; i++) {
+            data[i] = Math.round(originData[i]["r"]*1000)/10;
+            dataday[i] = originData[i]["inday"];          
+
+            if(data[i]>maxr){
+                maxr = data[i];
+            }
+
+            if(data[i]<minr){
+                minr = data[i];
+            }
+        }
+
+        maxr = Math.ceil(maxr/5)*5+5;
+        if(maxr>100){
+            maxr = 100;
+        }
+
+        minr = Math.floor(minr/5)*5-5;
+        if(minr<0){
+            minr = 0;
+        }
+
+        var myChart = echarts.init(document.getElementById('main'));
+ 
+        var option = {
+    backgroundColor:'#38404b',
+    title : {
+        text: tit,
+        textStyle:{fontSize:'24',color:'#fff',fontFamily:'Microsoft YaHei'},
+        subtext:subtit,
+        subtextStyle:{fontSize:'18',color: '#999999',fontFamily:'Microsoft YaHei'},
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'axis',
+        textStyle:{fontSize:'16',color:'#fff',fontFamily:'Microsoft YaHei'}
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            axisLine:{lineStyle:{color:'#d4e0ec'}},
+            boundaryGap : false,
+            axisLabel:{
+                interval:0,
+                textStyle:{color:'#d4e0ec',fontSize:'12'}
+            },
+            data : dataday
+        }
+    ],
+    yAxis : [
+        {
+            name:'百分比',
+            nameTextStyle:{
+                fontSize:'16',
+                fontFamily:'Microsoft YaHei'
+            },
+            type : 'value',
+            axisLine:{lineStyle:{color:'#d4e0ec'}},
+            axisLabel:{textStyle:{color:'#d4e0ec',fontSize:'12'}},
+            min:minr,
+            max:maxr
+        }
+    ],
+    series : [
+        {
+            name:'及时率',
+            type:'line',
+            data:data,
+            itemStyle: {                // 系列级个性化
+                normal: {
+                    borderWidth: 5,
+                    borderColor:'#6cc4f4',
+                    color: '#6cc4f4'
+                },
+                emphasis: {
+                    borderColor:'#6cc4f4',
+                    color: '#6cc4f4'
+                }
+            }
+        }
+    ]
+};
+                    
+                               
+        myChart.setOption(option);
+    }
+    </script> 
+    
+</head>
+
+<body>
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+</html>

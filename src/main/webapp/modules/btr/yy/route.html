@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>路由图</title>
+ 
+    <script src="../../tools/echarts-2.0.4/echarts-plain-map.js"></script>
+
+    <script type="text/javascript">
+    var globalValiable = window.parent.globalValiable;
+
+    window.onload = function() {
+        if(globalValiable && globalValiable.data) {
+            var originData = globalValiable.data;
+            var centerlist = [];
+            for(var i = 0; i < originData.length; i++) {
+                var center = originData[i]["fromc"].replace('分拨','');
+                if( !centerlist.contains(center) ){
+                    centerlist.push(center);
+                    document.getElementById("searchDistribution")
+                    .options.add(new Option(center,center));
+                }
+            }
+            painting();
+        }
+        return;
+    } 
+
+    function painting(){        
+        queryParams = globalValiable.queryParams;     
+        show(globalValiable.data);
+        return   
+    }
+
+    function show(originData) {
+        var week = document.getElementById('searchDay').value;
+        var startsite = document.getElementById('searchDistribution').value;
+        var maptype = document.getElementById('maptype').value;
+        if(maptype == 1){
+            maintitle = '出港路由示意图';
+        }
+        else{
+            maintitle = '入港路由示意图';
+        }
+        var route = [];
+        var online = [];
+        var lastsite = [];
+        var series = [];
+        var color;
+        if(document.getElementById('color').value == 1){
+            color = ['#10E7FF','#00FF12','#FF259F','#00E5FF','#ECC9FF',
+        '#FFDC25','#6AFF19','#FF3323','#C938E8','#8FA1FF',
+        '#AFFF1F','#0DFFAF','#E88A7D','#FF7C25','#99F2A8',
+        '#FFEF51','#898F9B','#FF1493','#FF432D','#766FE8'];
+        }
+        else{
+            color = ['#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1',
+        '#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1',
+        '#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1',
+        '#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1','#7DB2A1'];
+        }
+        var eff = false;
+        var shadow = 0;
+        if(document.getElementById('effect').value == 1){
+            eff = true;
+            shadow = 10;
+        }
+        var colorcount = 0;
+        var dataroute2 = {};
+        dataroute2 = [];
+
+        for(var i = 0; i < originData.length; i++) {
+            var center = originData[i]["fromc"].replace('分拨','');
+
+            if(startsite == ''){
+                startsite = center;
+            }
+
+            route[i] = originData[i]["route"];
+            online[i] = originData[i]["effectday"];
+        }
+
+        series.push( {
+            name: '全国',
+            type: 'map',
+            roam: true,
+            hoverable: false,
+            mapType: 'china',
+            itemStyle:{
+                normal:{
+                    borderColor:'rgba(0,138,186,0.9)',
+                    borderWidth:2,
+                    areaStyle:{
+                        color: '#262126'
+                    }
+                }
+            },
+            data:[],
+            markLine : {
+                smooth:true,
+                symbol: ['none', 'circle'],  
+                symbolSize : 1,
+                itemStyle : {
+                    normal: {
+                        color:'#fff',
+                        borderWidth:1,
+                        borderColor:'rgba(30,144,255,0.5)'
+                    }
+                },
+                data : [],
+            },
+            geoCoord: {
+                '浙江':[120.1801,30.2563],
+                '江苏':[118.8477,31.9564],
+                '安徽':[117.29,32.0581],
+                '河北':[114.4995,38.1006],
+                '广东':[113.5107,23.2196],
+                '山东':[117.1582,36.8701],
+                '福建':[119.4543,25.9222],
+                '湖北':[114.154,30.6186],
+                '河南':[113.4668,34.6234],
+
+
+                '上海': [121.335,31.1342],
+                '金山': [121.3296,30.9478],
+                '上海市区': [121.5491,31.2269],
+                '浦东': [121.8119,31.455],
+                '合肥': [117.29,32.0581],
+                '芜湖': [118.4404,31.3383],
+                '蚌埠': [117.3975,32.9039],
+                '杭州': [120.1801,30.2563],
+                '嘉兴': [120.7711,30.7402],
+                '金华': [119.635,29.1137],
+                '台州': [121.4334,28.6461],
+                '温州': [120.7136,27.9724],
+                '宁波': [121.5622,29.8782],
+                '衢州': [118.9037,28.9419],
+                '丽水': [119.9547,28.4187],
+                '苏州': [120.6083,31.2811],
+                '南京': [118.8477,31.9564],
+                '盐城': [120.1794,33.35],
+                '泰州': [119.9345,32.4761],
+                '南通': [120.8934,31.9913],
+                '淮安': [119.079,33.5977],
+                '徐州': [117.2013,34.2313],
+                '扬州': [119.4401,32.3844],
+                '常州': [119.9667,31.7892],
+                '宿迁': [118.2856,33.9108],
+                '南京市区': [118.9188,32.103],
+                '北京北': [116.6602,40.1299],
+                '北京': [116.4713,39.9452],
+                '唐山': [118.4766,39.6826],
+                '保定': [115.0488,39.0948],
+                '邯郸': [114.5022,36.586],
+                '石家庄': [114.4995,38.1006],
+                '天津': [117.4219,39.4189],
+                '漳州': [117.6763,24.5078],
+                '福州': [119.4543,25.9222],
+                '厦门': [118.1689,24.6478],
+                '泉州': [118.3228,25.1147],
+                '郑州': [113.4668,34.6234],
+                '洛阳': [112.4445,34.6533],
+                '新乡': [113.9347,35.2668],
+                '武昌': [114.3616,30.5419],
+                '武汉': [114.154,30.6186],
+                '临沂': [118.3118,35.2936],
+                '济南': [117.1582,36.8701],
+                '潍坊': [119.0918,36.524],
+                '烟台': [120.7397,37.5128],
+                '济宁': [116.8286,35.3375],
+                '青岛': [120.4651,36.3373],
+                '菏泽': [115.6201,35.2057],
+                '中山': [113.4229,22.478],
+                '汕头': [117.1692,23.3405],
+                '海口': [110.3893,19.8516],
+                '江门': [112.6318,22.1484],
+                '惠州': [114.6204,23.1647],
+                '广州': [113.5107,23.2196],
+                '深圳': [114.2566,22.7069],
+                '深圳清水河': [114.1359,22.5499],
+                '番禺': [113.4018,22.9292],
+                '新塘': [113.8341,23.2717],
+                '大朗': [113.9491,22.9478],
+                '珠海': [113.5656,22.2493],
+                '虎门': [113.6856,22.8184]               
+            }
+        });
+        
+        for(var i = 0; i < route.length; i++){
+            var v;
+            if(maptype == 1){
+                v = route[i].substr(0,route[i].indexOf('['));
+            } 
+            else{
+                var tempstr = '';
+                for(var j=route[i].length;j>=1;j--){
+                    tempstr += route[i].substring(j-1,j);
+                }
+                v = tempstr.substr(tempstr.indexOf('[') + 1,
+                    tempstr.indexOf('>') - tempstr.indexOf('[') - 1);
+                tempstr = '';
+                for(var j=v.length;j>=1;j--){
+                    tempstr += v.substring(j-1,j);
+                }
+                v = tempstr;
+            }
+
+            if((online[i].indexOf(week)>= 0)&&(startsite == v)){
+                var str = route[i];
+                var j = 0;
+                var dataroute = {};
+                dataroute = [];
+                var datar = [];
+
+                dataroute
+                .push({name: str.substr(0,str.indexOf('[')),
+                value:'\n\n' + str.substr(0,str.indexOf('['))});
+                dataroute2
+                .push({name: str.substr(0,str.indexOf('[')),value:str.substr(0,str.indexOf('['))});
+
+                if(maptype == 0){
+                    lastsite.push(dist2);
+                }
+
+                while(str.indexOf('>')>= 0){
+                    var dist1 = str.substr(0,str.indexOf('['));
+
+                    str = str.substr(str.indexOf('>') + 1,str.length - str.indexOf('>') - 1);
+                    var dist2 = str.substr(0,str.indexOf('['));
+
+                    if(str.indexOf(',')>= 0){
+                        var time =dist2 + ':' + str
+                        .substr(str.indexOf('[') + 1,str.indexOf(',') - str.indexOf('[') - 1);
+                    }
+                    else{
+                        var time =  dist2 + ':' + str
+                        .substr(str.indexOf('[') + 1,str.indexOf(']') - str.indexOf('[') - 1);
+                    }
+
+                    dataroute.push({name: dist2,value:'\n\n' + dist2});
+                    dataroute2.push({name: dist2,value: time});
+
+                    var temp = {};
+                    temp = [];
+                    temp.push({name:dist1});
+                    temp.push({name: dist2,value: time});
+                    datar[j] = temp;
+                    j += 1;
+
+                    if((str.indexOf('>')< 0)&&(maptype == 1)){
+                        lastsite.push(dist2);
+                    }
+                }
+
+                var t =
+            {
+            name: '管它叫什么呢',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: shadow
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:1,
+                        color:color[colorcount],
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    },
+                    emphasis:{
+                        color:color[colorcount]
+                    }
+                },
+                data : datar
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function(v){
+                    var s = 1;
+                    if(v.indexOf(startsite)>=0){
+                        s=6;
+                    }
+                    return s;
+                },
+                effect : {
+                    show: eff,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        color:'#FFFA40',
+                        label:{
+                            textStyle:{
+                                color:'#FFFA40',
+                                fontSize:'16',
+                                fontFamily:'Microsoft YaHei'
+                            }
+                        }
+                    },
+                    emphasis:{
+                        color:'#FFFA40',
+                        label:{
+                            textStyle:{
+                                color:'#FFFA40',
+                                fontSize:'16',
+                                fontFamily:'Microsoft YaHei'
+                            }
+                        }
+                    }
+                },
+                data : dataroute
+            }
+        };
+
+        series.push(t);
+
+            colorcount++;
+            if(colorcount == 20){
+                colorcount = 0;
+            }
+            }
+        }
+    var myChart = echarts.init(document.getElementById('main'));
+    
+        var option = {
+    backgroundColor: '#262126',
+    color: ['gold','aqua','lime'],
+    title : {
+        text: maintitle,
+        textStyle:{fontSize:'24',color:'#fff',fontFamily:'Microsoft YaHei'},
+        subtext:'当前选择:' + startsite + '分拨',
+        subtextStyle:{fontSize:'18',color: '#999999',fontFamily:'Microsoft YaHei'},
+        x:'left'
+    },
+    tooltip : {
+        trigger: 'item',
+        textStyle:{color:'#E8C446',fontSize:'18',fontFamily:'Microsoft YaHei'},
+        formatter: function (v) {
+            var str = '';
+            if(v[1].indexOf('>')>0){
+                str = v[1].replace(':', ' > ');
+                var temp = str.substr(str.indexOf('>')+2,str.length - str.indexOf('>')-2);
+                for(var i = 0; i < dataroute2.length; i++){
+                    if(dataroute2[i].name == temp){
+                        str = str.substr(0,str.indexOf('>') + 2) + dataroute2[i].value;
+                    }
+                }
+            }
+            return str;
+        }
+    },
+    series : series
+};          
+        myChart.setOption(option);
+    }
+    </script> 
+    
+</head>
+
+<body style="font-family:Microsoft YaHei;font-size:16px;">
+    选择周期: <select id="searchDay"  style="font-family:Microsoft YaHei;font-size:16px;" onchange="painting()">
+    <option value="1">星期一</option>
+    <option value="2">星期二</option>
+    <option value="3">星期三</option>
+    <option value="4">星期四</option>
+    <option value="5">星期五</option>
+    <option value="6">星期六</option>
+    <option value="7">星期日</option>            
+    </select>&nbsp;
+    选择分拨: <select id="searchDistribution" style="font-family:Microsoft YaHei;font-size:16px;" onchange="painting()">      
+    </select>&nbsp;
+    路由类型: <select id="maptype" style="font-family:Microsoft YaHei;font-size:16px;" onchange="painting()">
+    <option value="1">出港路由图</option> 
+    <option value="0">入港路由图</option>      
+    </select>&nbsp;
+    颜色区分: <select id="color" style="font-family:Microsoft YaHei;font-size:16px;" onchange="painting()">
+    <option value="1">是</option> 
+    <option value="0">否</option>      
+    </select>&nbsp;
+    开启动画: <select id="effect" style="font-family:Microsoft YaHei;font-size:16px;" onchange="painting()">
+    <option value="1">是</option> 
+    <option value="0">否</option>      
+    </select>&nbsp;
+
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+</html>

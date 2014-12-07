@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>分拨时效地图</title>
+ 
+    <script src="../../tools/echarts-2.0.4/echarts-plain-map.js"></script>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        var sub;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            sub = queryParams.param1 + '至' + queryParams.param2;
+            show(globalValiable.data,queryParams.param3,sub);
+            return;
+        }
+    } 
+
+
+    function show(originData,tit,subtit) {
+        var dataroute1 = {};
+        dataroute1 = [];
+        var datar1 = [];
+        var dataroute2 = {};
+        dataroute2 = [];
+        var datar2 = [];
+        var dataroute3 = {};
+        dataroute3 = [];
+        var datar3 = [];
+        var dataroute4 = {};
+        dataroute4 = [];
+        var datar4 = [];
+        var dataroute5 = {};
+        dataroute5 = [];
+        var datar5 = [];
+        var fromc = (tit.replace(/分拨/, "")).replace(/分公司/, "");
+
+        var j1 = 0;
+        var j2 = 0;
+        var j3 = 0;
+        var j4 = 0;
+        var j5 = 0;
+        for(var i = 0; i < originData.length; i++) {
+            var temp = {};
+            temp = [];
+            if(originData[i]["r"]>=95){
+                dataroute1.push({name: originData[i]["name"],value: originData[i]["r"]});
+                temp.push({name:fromc});
+                temp.push({name: originData[i]["name"],value: originData[i]["r"]});
+                datar1[j1] = temp;
+                j1 += 1;
+            }
+            else if((originData[i]["r"]>=80)&&(originData[i]["r"]<95)){
+                dataroute2.push({name: originData[i]["name"],value: originData[i]["r"]});
+                temp.push({name:fromc});
+                temp.push({name: originData[i]["name"],value: originData[i]["r"]});
+                datar2[j2] = temp;
+                j2 += 1;
+            }
+            else if((originData[i]["r"]>=70)&&(originData[i]["r"]<80)){
+                dataroute3.push({name: originData[i]["name"],value: originData[i]["r"]});
+                temp.push({name:fromc});
+                temp.push({name: originData[i]["name"],value: originData[i]["r"]});
+                datar3[j3] = temp;
+                j3 += 1;
+            }
+            else if((originData[i]["r"]>=50)&&(originData[i]["r"]<70)){
+                dataroute4.push({name: originData[i]["name"],value: originData[i]["r"]});
+                temp.push({name:fromc});
+                temp.push({name: originData[i]["name"],value: originData[i]["r"]});
+                datar4[j4] = temp;
+                j4 += 1;
+            }
+            else{
+                dataroute5.push({name: originData[i]["name"],value: originData[i]["r"]});
+                temp.push({name:fromc});
+                temp.push({name: originData[i]["name"],value: originData[i]["r"]});
+                datar5[j5] = temp;
+                j5 += 1;
+            }  
+        }
+
+        var myChart = echarts.init(document.getElementById('main'));
+ 
+        var option = {
+    backgroundColor: '#1b1b1b',
+    color: ['gold','aqua','lime'],
+    title : {
+        text: tit + '时效地图',
+        textStyle:{fontSize:'24',color:'#fff',fontFamily:'Microsoft YaHei'},
+        subtext:subtit,
+        subtextStyle:{fontSize:'18',color: '#999999',fontFamily:'Microsoft YaHei'},
+        x:'left'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: function (v) {
+            var str = '';
+            if(v[1].indexOf('>')>0){
+                str = v[1].replace(':', ' > ');
+            }
+            return str;
+        }
+    },
+    dataRange: {
+        min : 0,
+        max : 100,
+        calculable : true,
+        color: ['aqua','lime','yellow','orange', '#ff3333'],
+        textStyle:{color:'#fff',fontFamily:'Microsoft YaHei'}
+    },
+    series : [
+        {
+            name: '全国',
+            type: 'map',
+            roam: true,
+            hoverable: false,
+            mapType: 'china',
+            itemStyle:{
+                normal:{
+                    borderColor:'rgba(100,149,237,1)',
+                    borderWidth:0.5,
+                    areaStyle:{
+                        color: '#1b1b1b'
+                    }
+                }
+            },
+            data:[],
+            markLine : {
+                smooth:true,
+                symbol: ['none', 'circle'],  
+                symbolSize : 1,
+                itemStyle : {
+                    normal: {
+                        color:'#fff',
+                        borderWidth:1,
+                        borderColor:'rgba(30,144,255,0.5)'
+                    }
+                },
+                data : [],
+            },
+            geoCoord: {
+                '浙江':[120.1801,30.2563],
+                '江苏':[118.8477,31.9564],
+                '安徽':[117.29,32.0581],
+                '河北':[114.4995,38.1006],
+                '广东':[113.5107,23.2196],
+                '山东':[117.1582,36.8701],
+                '福建':[119.4543,25.9222],
+                '湖北':[114.154,30.6186],
+                '河南':[113.4668,34.6234],
+
+
+                '上海': [121.335,31.1342],
+                '金山': [121.3296,30.9478],
+                '上海市区': [121.5491,31.2269],
+                '浦东': [121.8119,31.455],
+                '合肥': [117.29,32.0581],
+                '芜湖': [118.4404,31.3383],
+                '蚌埠': [117.3975,32.9039],
+                '杭州': [120.1801,30.2563],
+                '嘉兴': [120.7711,30.7402],
+                '金华': [119.635,29.1137],
+                '台州': [121.4334,28.6461],
+                '温州': [120.7136,27.9724],
+                '宁波': [121.5622,29.8782],
+                '衢州': [118.9037,28.9419],
+                '丽水': [119.9547,28.4187],
+                '苏州': [120.6083,31.2811],
+                '南京': [118.8477,31.9564],
+                '盐城': [120.1794,33.35],
+                '泰州': [119.9345,32.4761],
+                '南通': [120.8934,31.9913],
+                '淮安': [119.079,33.5977],
+                '徐州': [117.2013,34.2313],
+                '扬州': [119.4401,32.3844],
+                '常州': [119.9667,31.7892],
+                '宿迁': [118.2856,33.9108],
+                '南京市区': [118.9188,32.103],
+                '北京北': [116.6602,40.1299],
+                '北京': [116.4713,39.9452],
+                '唐山': [118.4766,39.6826],
+                '保定': [115.0488,39.0948],
+                '邯郸': [114.5022,36.586],
+                '石家庄': [114.4995,38.1006],
+                '天津': [117.4219,39.4189],
+                '漳州': [117.6763,24.5078],
+                '福州': [119.4543,25.9222],
+                '厦门': [118.1689,24.6478],
+                '泉州': [118.3228,25.1147],
+                '郑州': [113.4668,34.6234],
+                '洛阳': [112.4445,34.6533],
+                '新乡': [113.9347,35.2668],
+                '武昌': [114.3616,30.5419],
+                '武汉': [114.154,30.6186],
+                '临沂': [118.3118,35.2936],
+                '济南': [117.1582,36.8701],
+                '潍坊': [119.0918,36.524],
+                '烟台': [120.7397,37.5128],
+                '济宁': [116.8286,35.3375],
+                '青岛': [120.4651,36.3373],
+                '菏泽': [115.6201,35.2057],
+                '中山': [113.4229,22.478],
+                '汕头': [117.1692,23.3405],
+                '海口': [110.3893,19.8516],
+                '江门': [112.6318,22.1484],
+                '惠州': [114.6204,23.1647],
+                '广州': [113.5107,23.2196],
+                '深圳': [114.2566,22.7069],
+                '深圳清水河': [114.1359,22.5499],
+                '番禺': [113.4018,22.9292],
+                '新塘': [113.8341,23.2717],
+                '大朗': [113.9491,22.9478],
+                '珠海': [113.5656,22.2493],
+                '虎门': [113.6856,22.8184]               
+            }
+        },
+        {
+            name: 'A',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:0.2,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : datar1
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 2*(11 - v/10);
+                },
+                effect : {
+                    show: false,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis:{
+                        label:{
+                            textStyle:{fontSize:'20',fontFamily:'Microsoft YaHei'}
+                        }
+                    }
+                },
+                data : dataroute1
+            }
+        },
+        {
+            name: 'B',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:0.5,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : datar2
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 2*(11 - v/10);
+                },
+                effect : {
+                    show: false,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis:{
+                        label:{
+                            textStyle:{fontSize:'20',fontFamily:'Microsoft YaHei'}
+                        }
+                    }
+                },
+                data : dataroute2
+            }
+        },
+        {
+            name: 'C',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:1,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : datar3
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 2*(11 - v/10);
+                },
+                effect : {
+                    show: false,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis:{
+                        label:{
+                            textStyle:{fontSize:'20',fontFamily:'Microsoft YaHei'}
+                        }
+                    }
+                },
+                data : dataroute3
+            }
+        },
+        {
+            name: 'D',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:1.5,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : datar4
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 2*(11 - v/10);
+                },
+                effect : {
+                    show: false,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis:{
+                        label:{
+                            textStyle:{fontSize:'20',fontFamily:'Microsoft YaHei'}
+                        }
+                    }
+                },
+                data : dataroute4
+            }
+        },
+        {
+            name: 'E',
+            type: 'map',
+            mapType: 'china',
+            data:[],
+            markLine : {
+                smooth:true,
+                effect : {
+                    show: true,
+                    scaleSize: 1,
+                    period: 30,
+                    color: '#fff',
+                    shadowBlur: 10
+                },
+                itemStyle : {
+                    normal: {
+                        borderWidth:2,
+                        lineStyle: {
+                            type: 'solid',
+                            shadowBlur: 10
+                        }
+                    }
+                },
+                data : datar5
+            },
+            markPoint : {
+                symbol:'emptyCircle',
+                symbolSize : function (v){
+                    return 2*(11 - v/10);
+                },
+                effect : {
+                    show: false,
+                    shadowBlur : 0
+                },
+                itemStyle:{
+                    normal:{
+                        label:{show:false}
+                    },
+                    emphasis:{
+                        label:{
+                            textStyle:{fontSize:'20',fontFamily:'Microsoft YaHei'}
+                        }
+                    }
+                },
+                data : dataroute5
+            }
+        }
+    ]
+};              
+        myChart.setOption(option);
+    }
+    </script> 
+    
+</head>
+
+<body>
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+</html>

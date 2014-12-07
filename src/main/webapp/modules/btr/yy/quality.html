@@ -15,9 +15,10 @@
 	<script src="../../framework/ajax.js"></script>
 	<script src="../../dm/common.js"></script>
 
-
 	<script type="text/javascript">
 
+	var dt;
+	
     Array.prototype.contains = function(obj) {  
         var i = this.length;  
         while (i--) {  
@@ -31,13 +32,29 @@
 	window.onload = function() {
         var globalValiable = window.parent.globalValiable;
         if(globalValiable && globalValiable.data) {
-            //queryParams = globalValiable.queryParams;
+            queryParams = globalValiable.queryParams;
             //title = queryParams.param1 + '日 问题件破损短少类型各省份占比';
-            show(globalValiable.data);
+            var tit = document.getElementById('detailtitle');
+            if(queryParams.param3=='MisclassN'){
+            	dt = '错分率';
+            }
+            else if(queryParams.param3=='BrokenN'){
+            	dt = '破损率';
+            }
+            else{
+            	dt = '遗失率';
+            }
+
+            if(queryParams.param4 == undefined){
+                show(globalValiable.data,'全网');
+            }
+            else{
+                show(globalValiable.data,'总计');
+            }
             return;
         }
     } 
-	function show(originData) { 
+	function show(originData,total) { 
 
         var centers = [];        
         var dayList = [];  
@@ -74,7 +91,7 @@
         		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dayList[i] + '</th>');
         	}
         	else{
-        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">累计</th>');
+        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dt + '累计</th>');
         	}
         }
 		
@@ -104,7 +121,7 @@
 		     }
 
 		     //data.rows.push(row);
-		     if (center != '全网') {data.rows.push(row);} else{data.footer.push(row);};
+		     if (center != total) {data.rows.push(row);} else{data.footer.push(row);};
 		     
 		}
 
@@ -147,11 +164,16 @@
 	     
 
 	    function styler(value,row,index){
-			return 'color:red;font-weight:bold;';
+			if(value == 0){
+	    		return 'color:#389562;font-weight:bold;';
+	    	}
+	    	else{
+	    		return 'color:#C70B25;font-weight:bold;';
+	    	}
 		}
 
 	    function formatter(value, row, index){
-			return formatMoney(value, 1);
+			return formatMoney(value, 2);
 		}
 
 		function formatMoney(s, n) {   
@@ -176,7 +198,7 @@
 			<table id="detailTable" >
 		        <thead frozen="true">
 		            <tr>
-		                <th field="name" width="200">名称</th>
+		                <th  id='detailtitle' field="name" width="200">名称</th>
 		            </tr>
 		        </thead>
 		        <thead>

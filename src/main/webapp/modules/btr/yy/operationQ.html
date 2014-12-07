@@ -31,13 +31,19 @@
 	window.onload = function() {
         var globalValiable = window.parent.globalValiable;
         if(globalValiable && globalValiable.data) {
-            //queryParams = globalValiable.queryParams;
+            queryParams = globalValiable.queryParams;
             //title = queryParams.param1 + '日 问题件破损短少类型各省份占比';
-            show(globalValiable.data);
+
+            if(queryParams.param3 == undefined){
+                show(globalValiable.data,'全网');
+            }
+            else{
+                show(globalValiable.data,'总计');
+            }
             return;
         }
     } 
-	function show(originData) { 
+	function show(originData,total) { 
 
         var centers = [];        
         var dayList = [];  
@@ -90,7 +96,7 @@
 		     }
 
 		     //data.rows.push(row);
-		     if (center != '全网') {data.rows.push(row);} else{data.footer.push(row);};
+		     if (center != total) {data.rows.push(row);} else{data.footer.push(row);};
 		     
 		}
 

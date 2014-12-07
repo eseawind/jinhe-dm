@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8" />
-	<title>错分率、破损率、遗失率</title>
+	<title>扫描率</title>
 
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../../tools/easyui/themes/icon.css">
@@ -32,7 +32,7 @@
         var globalValiable = window.parent.globalValiable;
         if(globalValiable && globalValiable.data) {
             //queryParams = globalValiable.queryParams;
-            //title = queryParams.param1 + '日 问题件破损短少类型各省份占比';
+            //title = queryParams.param1 + '日 人员数据';
             show(globalValiable.data);
             return;
         }
@@ -41,10 +41,10 @@
 
         var centers = [];        
         var dayList = [];  
-        var dataMap = {};  
-        var dataMap2 = {};      
+        var dataMap = {}; 
+		var dataMap2 = {};      
         for(var i = originData.length - 1; i >= 0 ; i--) {
-            var day = originData[i]["inday"];
+            var day = originData[i]["d"];
             if( !dayList.contains(day) ){
                 dayList.push(day);
             }
@@ -54,28 +54,22 @@
             if(dataMap[center] == null) {
                  dataMap[center] = [];                 
             }
-
-            if(dataMap2[center] == null) {
+			if(dataMap2[center] == null) {
                  dataMap2[center] = [];                 
             }
 
-            var num = originData[i]["n"];
-            var tot = originData[i]["tn"];
+            var w = originData[i]["w"];
+			var r = originData[i]["r"];
            
-            dataMap[center][day] = num;
-            dataMap2[center][day] = tot;
+            dataMap[center][day] = w;
+			dataMap2[center][day] = r;
             dataMap[center].type = type;
         }
 
         var cHtml = [];  
         dayList.reverse();       
         for(var i=0; i < dayList.length; i++) {        	
-        	if (i<dayList.length-1){
-        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dayList[i] + '</th>');
-        	}
-        	else{
-        		cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">累计</th>');
-        	}
+        	cHtml.push('<th field="' + dayList[i] + '" width="90" align="right" formatter="formatter" styler="styler">' + dayList[i] + '</th>');
         }
 		
 		$$("cityColumn").innerHTML = cHtml.join("\n");
@@ -88,20 +82,34 @@
 		for(var center in dataMap) {
 		     var row = {};
 		     var k = 0;
-		     var t = 0;
+			 var k2 = 0;
 		     row.name = center;
 		     row.rank = dataMap[center].type;		     
 		     for(var i = 0; i < dayList.length; i++) {
-		     	row[dayList[i]] = 200000*dataMap[center][dayList[i]]/dataMap2[center][dayList[i]] || 0;
+		     	if(dataMap2[center][dayList[i]]==0)
+				{
+					row[dayList[i]]=0
+				}
+				else
+				{
+					row[dayList[i]] = (dataMap[center][dayList[i]] || 0)/(dataMap2[center][dayList[i]] || 0)*100;
+				}
 		         
 		         if(i == dayList.length-1){
-		         	row[dayList[i]] = 200000*k/t;
+					 if(k2==0){
+						 row[dayList[i]]=0
+					 }
+					 else
+					 {
+		         	row[dayList[i]] = k/k2;
+					 }
 		         }
 		         else{
-		         	k = k + (dataMap[center][dayList[i]] || 0);
-		         	t = t + (dataMap2[center][dayList[i]] || 0);
+		         	k = k + (dataMap[center][dayList[i]] || 0)*100;
+					k2 = k2 + (dataMap2[center][dayList[i]] || 0);
 		         }
 		     }
+
 
 		     //data.rows.push(row);
 		     if (center != '全网') {data.rows.push(row);} else{data.footer.push(row);};
@@ -151,7 +159,7 @@
 		}
 
 	    function formatter(value, row, index){
-			return formatMoney(value, 2);
+			return formatMoney(value, 1);
 		}
 
 		function formatMoney(s, n) {   

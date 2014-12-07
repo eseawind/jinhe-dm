@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" type="text/css" href="../../dm/common.css">
+    <script type="text/javascript" src="../../framework/core.js"></script>
+    <script type="text/javascript" src="../../framework/ajax.js"></script>
+    <script  src="../../dm/common.js"></script>
+    <title>省份分拨分重泡比计费货量分布</title>
+ 
+    <script src="../../tools/echarts-2.0.4/echarts-plain.js"></script>
+    
+    <script type="text/javascript">
+
+    window.onload = function() {
+        var globalValiable = window.parent.globalValiable;
+        if(globalValiable && globalValiable.data) {
+            queryParams = globalValiable.queryParams;
+            show(globalValiable.data,queryParams.param1,queryParams.param2,queryParams.param3);
+            return;
+        }
+    } 
+
+	
+	function show(originData,date1,date2,tit) {
+        var data2 = [];
+        var data3 = [];
+	
+        for(var i = 0; i < originData.length; i++){
+            data3[i] = originData[i]["s"];
+            data2[i] = originData[i]["w2"];
+        }
+
+		var myChart = echarts.init(document.getElementById('main'));
+ 
+        var option = {
+            backgroundColor:'#4d4d4d',
+            title : {
+                text: tit+'分重泡比计费货量分布',
+                textStyle:{fontSize:'22',color:'#ffffff',fontFamily:'Microsoft YaHei'},
+                subtext: date1 + '~' + date2,
+                subtextStyle:{fontSize:'18',color: '#000000',fontFamily:'Microsoft YaHei'},
+                x:'center',
+                y:'top'
+            },
+    tooltip : {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show : true,
+        y: 'bottom',
+        feature : {
+            mark : {show: false},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            name:'立方米/吨',
+            nameLocation:'start',
+            type : 'category',
+            nameTextStyle:{
+                fontSize:'16',
+                fontFamily:'Microsoft YaHei'
+            },
+            axisLine:{lineStyle:{color:'#ffffff'}},
+            splitLine : {show : false},
+            axisLabel:{
+                interval:0,
+                rotate:-30,
+                textStyle:{color:'#ffffff',fontSize:'12'}
+            },
+            data : data2
+        },
+    ],
+    yAxis : [
+        {
+            name:'吨',
+            type : 'value',
+            axisLine:{lineStyle:{color:'#ffffff'}},
+            nameTextStyle:{
+                fontSize:'16',
+                fontFamily:'Microsoft YaHei'
+            },
+            axisLabel:{textStyle:{color:'#ffffff',fontSize:'12'}},
+            position: 'right',
+            boundaryGap:[0,0.05]
+        }
+    ],
+    series : [
+        {
+            name:'货量',
+            type:'bar',
+            itemStyle : {
+                normal : {
+                    color:'#FF7F24'
+                }
+            },     
+            data:data3,
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'}
+                ],
+                itemStyle:{
+                    normal : {
+                        color:'#FF7F24'
+                    }
+                }
+            }
+        }
+    ]
+};
+
+                    
+        myChart.setOption(option);
+	}
+    </script> 
+    
+</head>
+
+<body>
+
+    <div id="main" style="height:660px;border:1px solid #ccc;padding:10px;"></div>
+
+</body>
+</html>

@@ -515,7 +515,7 @@
 
 	<distributionManagement>
 		<site>
-			<id>dms.llrs.com</id>
+			<id>dms.llrtss.com</id>
 			<url>file://</url>
 		</site>
 	</distributionManagement>

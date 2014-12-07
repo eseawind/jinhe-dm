@@ -15,7 +15,7 @@
   <strategy code="connpool-vf-oracle" name="DB连接池-VF只读库"> 
     <poolClass>com.jinhe.tss.cache.extension.ReusablePool</poolClass>  
     <poolSize>10</poolSize>  
-    <cyclelife>0</cyclelife>  
+    <cyclelife>43200000</cyclelife>  
     <interruptTime>1000</interruptTime>  
     <initNum>0</initNum>  
     <customizerClass>com.jinhe.tss.framework.persistence.connpool.ConnPoolCustomizer</customizerClass>  
@@ -25,7 +25,7 @@
   <strategy code="connpool-wfb-oracle" name="DB连接池-狼堡库"> 
     <poolClass>com.jinhe.tss.cache.extension.ReusablePool</poolClass>  
     <poolSize>10</poolSize>  
-    <cyclelife>0</cyclelife>  
+    <cyclelife>43200000</cyclelife>  
     <interruptTime>1000</interruptTime>  
     <initNum>0</initNum>  
     <customizerClass>com.jinhe.tss.framework.persistence.connpool.ConnPoolCustomizer</customizerClass>  

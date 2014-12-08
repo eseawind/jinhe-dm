@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -121,7 +122,7 @@ public class Display extends BaseActionSupport {
      */
     @RequestMapping("/json/{report}")
     @ResponseBody
-    public List<Map<String, Object>> showAsJson(HttpServletRequest request, @PathVariable("report") String report) {
+    public Object showAsJson(HttpServletRequest request, @PathVariable("report") String report) {
     	Long reportId;
     	try {
     		reportId = Long.valueOf(report);
@@ -138,6 +139,20 @@ public class Display extends BaseActionSupport {
         SQLExcutor excutor = reportService.queryReport(reportId, requestMap, 0, 0, getLoginUserId());
         
         outputAccessLog(reportId, "showAsJson", requestMap, start);
+        
+        // 如果定义了jsonpCallback参数，则为jsonp调用
+        String jsonpCallback = request.getParameter("jsonpCallback");
+		if(jsonpCallback != null) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			String jsonString;
+			try {
+				jsonString = objectMapper.writeValueAsString(excutor.result);
+			} catch (Exception e) {  
+				jsonString = "";
+      	    }  
+			
+        	return jsonpCallback + "(" + jsonString + ")";
+        }
         
         return excutor.result;
     }

@@ -455,10 +455,10 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<log.level>info</log.level>
-				<job.enable>false</job.enable>
-				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<environment>prod</environment>
+				<job.enable>false</job.enable>
+				<log.level>info</log.level>
+				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<tomcat.url>10.8.72.80:8888</tomcat.url>
 			</properties>
 		</profile>
@@ -468,10 +468,10 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<log.level>info</log.level>
-				<job.enable>true</job.enable>
-				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<environment>prod-job</environment>
+				<job.enable>true</job.enable>
+				<log.level>info</log.level>
+				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<tomcat.url>10.8.72.80:8888</tomcat.url>
 			</properties>
 		</profile>
@@ -481,10 +481,10 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<properties>
-				<log.level>debug</log.level>
-				<job.enable>true</job.enable>
-				<db.url>127.0.0.1:3306/btr_dms</db.url>
 				<environment>uat</environment>
+				<job.enable>true</job.enable>
+				<log.level>debug</log.level>
+				<db.url>127.0.0.1:3306/btr_dms</db.url>
 				<tomcat.url>bl00618-l</tomcat.url>
 			</properties>
 		</profile>
@@ -494,10 +494,10 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<log.level>debug</log.level>
-				<job.enable>true</job.enable>
-				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<environment>dev</environment>
+				<job.enable>true</job.enable>
+				<log.level>debug</log.level>
+				<db.url>127.0.0.1:3306/dms_btr</db.url>
 				<tomcat.url>localhost:8088</tomcat.url>
 			</properties>
 		</profile>

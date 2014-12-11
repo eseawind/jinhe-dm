@@ -1,7 +1,7 @@
 
 /*********************** 系统配置 开始 **********************************/
  var
-	IS_TEST = false,
+	IS_TEST = true,
 
 	FROMEWORK_CODE = "TSS",    /* 当前框架名 */
 	APP_CODE       = "DMS";    /* 当前应用名 */
@@ -819,6 +819,8 @@ function popupTree(url, nodeName, params, callback) {
 	document.body.appendChild(el);
 	$(el).center(300, 300).css("width", "300px").css("height", "300px").css("zIndex", "10001");
 
+	$(".bts .btWeak", el).click(removeDialog);
+
 	params = params || {};
 	$.ajax({
 		url: url,
@@ -840,9 +842,6 @@ function popupTree(url, nodeName, params, callback) {
 			}
 
 			$(".bts .btStrong", el).click(doCallback);
-			$(".bts .btWeak", el).click(function(){
-				removeDialog();
-			});
 		}
 	});
 }
@@ -860,6 +859,8 @@ function popupForm(url, nodeName, params, callback, title) {
 	    '</div>';
 	document.body.appendChild(el);
 	$(el).center(300, 300).css("zIndex", "10001");
+
+	$(".bts .btWeak", el).click(removeDialog);
 
 	params = params || {};
 
@@ -893,10 +894,6 @@ function popupForm(url, nodeName, params, callback, title) {
 		        removeDialog();
 		        callback(condition);
 			});
-
-			$(".bts .btWeak", el).click(function(){
-				removeDialog();
-			});
 		}
 	});
 }
@@ -923,15 +920,13 @@ function popupGrid(url, nodeName, title, params) {
 	$(el).center(600, 400).css("width", "600px").css("height", "auto");
 	$("#" + boxName, el).css("minHeight", "200px").css("maxHeight", "400px");
 
+	$(".bts .btWeak", el).click(removeDialog);
+
 	$.ajax({
 		url: url,
 		params: params || {},
 		onresult: function() {
 			$.G(boxName, this.getNodeValue(nodeName));
-
-			$(".bts .btWeak", el).click(function(){
-				removeDialog();
-			});
 		}
 	});
 }

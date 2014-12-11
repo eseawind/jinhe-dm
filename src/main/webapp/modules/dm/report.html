@@ -20,10 +20,48 @@
   .Formbox { display:none; background-color:#BEC6EE; border:1px solid #416371; border-radius: 5px; }
 
   #searchFormDiv { width:500px; height:500px; font-size: 12px; padding: 10px; overflow: auto; }
-  #searchFormDiv.buttonBox { margin: 20px 10px 10px 55px;  }
+  #searchFormDiv .buttonBox { margin: 20px 10px 10px 55px;  }
   
   #reportFormDiv { width: 78%; height: 500; padding: 10px; }
   #scheduleFormDiv { width: 50%; padding: 10px;}
+
+#reportParamsDiv { width: 466px; height: 350px; padding: 5px; }
+#reportParamsDiv Tree\:Box, #reportParamsDiv form { background-color:#fff; display:inline-block; height:337px; }
+#reportParamsDiv Tree\:Box { width:150px; }
+#reportParamsDiv form { width:281px; padding:5px; position: absolute; top: 5px; left: 177px;}
+
+#reportParamsDiv .required {
+    color: red;
+    width: 10px;
+    display: inline-block;
+ 	text-align: right;
+}
+#reportParamsDiv label {
+	display: inline-block;
+    width: 60px;
+    text-align: right;
+    line-height: 28px;
+    color: #CC99CC;
+}
+#reportParamsDiv input[type=text] {
+    width: 200px;
+    height: 18px;
+    line-height: 18px;
+    border: 1px solid #bababa;
+    border-radius: 3px;
+}
+#reportParamsDiv input[type=range] {
+    width: 178px;
+    margin-right: 5px;
+}
+#reportParamsDiv select {
+    border: 1px solid #bababa;
+    height: 20px;
+    width: 100px;
+    border-radius: 3px;
+}
+hr { height:4px; border:none; border-top: 1px dashed #555555; }
+#reportParamsDiv .bts { margin: 10px 10px 10px 60px; }
 
 </style>
 
@@ -103,8 +141,48 @@
 	0 15 10 ? * 6L    每月最后一周的星期五的10点15分触发    
 	0 15 10 ? * 6#3   每月的第三周的星期五开始触发    
 	0 0 12 1/5 * ?    每月的第一个中午开始每隔5天触发一次    
-	0 11 11 11 11 ?   每年的11月11号 11点11分触发(光棍节)   
+	0 11 11 11 11 ?   每年的11月11号 11点11分触发   
 	</pre>
+</div>
+
+<div id="reportParamsDiv" class="dialog Formbox">
+	<Tree:Box id="paramTree" moveable="true"></Tree:Box>
+	<form id="paramForm">
+		<label>参数名称：</label><input type="text" id="paramLabel" /><em class="required">*</em>
+		<br><label>参数类型：</label>
+		<select id="paramType">
+			<option value="string">字符串</option>
+			<option value="number">数字</option>
+			<option value="date">日期</option>
+			<option value="datetime">日期时间</option>
+		</select> 
+		<br><label>是否必填：</label>
+		<select id="paramNullable">
+			<option value="false">是</option>
+			<option value="false">否</option>
+		</select>  
+		<br><label>默认值：</label><input type="text" id="paramLabel" placeholder="为参数添加一个默认值"/>
+		<br><label>校验正则：</label><input type="text" id="paramCheckReg" />
+		
+		<br><label>宽度：</label> 
+		<input type="range" min="100" max="350" value="250" step="10" onchange="$('#paramWidth').html(this.value)"/><span id="paramWidth">250</span>px
+		<br><label>高度：</label>
+		<input type="range" min="18" max="180" value="18" step="1" onchange="$('#paramHeight').html(this.value)"/><span id="paramHeight">18</span>px
+		
+		<hr>
+		<label>下拉列表：</label><input type="text" id="paramOption" placeholder="格式：1|2|3, 周一|周二|周三"/>
+		<br><label>是否多选：</label>
+		<select id="paramMultiple">
+			<option value="false">是</option>
+			<option value="false">否</option>
+		</select> 
+		<br><label>联动方法：</label><input type="text" id="paramOnChange" />
+
+		<div class="bts">
+			<input type="button" class="btStrong" value="完成" id="reportParamsSave"/>
+			<input type="button" class="btWeak" value="关闭" id="closeReportParamsForm"/>
+		</div>
+	</form>
 </div>
 
 <iframe id="downloadFrame" style="display:none"></iframe>

@@ -612,6 +612,15 @@ function scheduleReport() {
 	}
 }
 
+// -------------------------------------------------   配置报表参数   ------------------------------------------------
+function configParams() {
+	// $.showWaitingLayer();
+
+	var rform = $.F("reportForm");
+	var paramsConfig = $.parseJSON(rform.getData("param"));
+	alert(paramsConfig);
+}
+
 // ------------------------------------------------- 多级下拉选择联动 ------------------------------------------------
 
 function getNextLevelOption(nextIndex, serviceID, currParam, currParamValue) {

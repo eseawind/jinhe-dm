@@ -178,7 +178,7 @@ public class ReportAction extends BaseActionSupport {
 		String jobCode = "ReportJob-" + reportId;
 		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
 		for(Param temp : jobParamItems) {
-			if(temp.getDescription().equals(jobCode)) {
+			if(jobCode.equals(temp.getDescription())) {
 				jobParamItem = temp;
 				break;
 			}
@@ -204,7 +204,7 @@ public class ReportAction extends BaseActionSupport {
 		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
 		if(jobParamItems != null) {
 			for(Param temp : jobParamItems) {
-				if(temp.getDescription().equals(jobCode)) {
+				if(jobCode.equals(temp.getDescription())) {
 					String value = temp.getValue();
 					return EasyUtils.split(value, "|");
 				}

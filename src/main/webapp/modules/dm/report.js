@@ -195,19 +195,19 @@ function loadInitData() {
 
 function loadReportDetail(isCreate, readonly, type) { 
 	var treeNode = $.T("tree").getActiveTreeNode();
-	var treeID = treeNode.id;
+	var treeNodeID = treeNode.id;
 	type = type || treeNode.getAttribute("type") ;
 	
-	delete $.cache.Variables["treeID_SF"];
+	delete $.cache.Variables["treeNodeID_SF"];
 	$("#searchFormDiv").hide();
 	Element.show($1("reportFormDiv"));
 	
 	var params = {};
 	if( isCreate ) {
-		params["parentId"] = treeID; // 新增
+		params["parentId"] = treeNodeID; // 新增
 		readonly = false;
 	} else {
-		params["reportId"] = treeID; // 修改					
+		params["reportId"] = treeNodeID; // 修改					
 	}
 
 	$1("sourceSave").disabled = readonly ? "true" : "";
@@ -217,33 +217,33 @@ function loadReportDetail(isCreate, readonly, type) {
 		params : params,
 		onresult : function() { 
 			var sourceInfoNode = this.getNodeValue(XML_SOURCE_INFO);
-			$.cache.XmlDatas[treeID] = sourceInfoNode;
+			$.cache.XmlDatas[treeNodeID] = sourceInfoNode;
 			
 			$1("reportForm").editable = readonly ? "false" : "true";
 			var xform = $.F("reportForm", sourceInfoNode);
 		
 			// 设置保存/关闭按钮操作
 			$1("closeReportForm").onclick = function() {
-				$("#reportFormDiv").hide();
+				closeReportFormDiv();
 			}
 			$1("sourceSave").onclick = function() {
-				saveReport(treeID);
+				saveReport(treeNodeID);
 			}
 		},
 		onexception : function() { 
-			$("#reportFormDiv").hide();
+			closeReportFormDiv();
 		}
 	});
 }
 
-function saveReport(treeID) {
+function saveReport(treeNodeID) {
 	var xform = $.F("reportForm");	
 	if( !xform.checkForm() ) return;
 
 	var request = new $.HttpRequest();
 	request.url = URL_SAVE_SOURCE;
 
-	var sourceInfoNode = $.cache.XmlDatas[treeID];
+	var sourceInfoNode = $.cache.XmlDatas[treeNodeID];
 	var dataNode = sourceInfoNode.querySelector("data");
 	request.setFormContent(dataNode);
 
@@ -251,17 +251,19 @@ function saveReport(treeID) {
 
 	request.onresult = function() { // 新增结果返回              
 		var xmlNode = this.getNodeValue(XML_SOURCE_TREE).querySelector("treeNode");
-		appendTreeNode(treeID, xmlNode);
-		
-		$("#reportFormDiv").hide()
+		appendTreeNode(treeNodeID, xmlNode);
+		closeReportFormDiv();
 	}
-
 	request.onsuccess = function() { // 更新
-		modifyTreeNode(treeID, "name", xform.getData("name"));
-		
-		$("#reportFormDiv").hide()
+		modifyTreeNode(treeNodeID, "name", xform.getData("name"));
+		closeReportFormDiv();
 	}
 	request.send();
+}
+
+function closeReportFormDiv() {
+	$("#reportParamsDiv").hide();
+	$("#reportFormDiv").hide();
 }
 
 function deleteReport()  { delTreeNode(URL_DELETE_SOURCE); }
@@ -472,7 +474,7 @@ window.onload = init;
  
 
 function createQueryForm(treeID, paramConfig, callback) {
-	if( $.cache.Variables["treeID_SF"] == treeID && $.funcCompare($.cache.Variables["callback_SF"], callback) ) {
+	if( $.cache.Variables["treeNodeID_SF"] == treeID && $.funcCompare($.cache.Variables["callback_SF"], callback) ) {
 		Element.show($1("searchFormDiv"));  // 如果上一次打开的和本次打开的是同一报表的查询框，则直接显示
 		return;
 	}
@@ -492,7 +494,7 @@ function createQueryForm(treeID, paramConfig, callback) {
 	$("#reportName").html("查询报表【" + getTreeNodeName() + "】");
 
 	$.cache.XmlDatas["searchFormXML"] = searchForm.template.sourceXML;
-	$.cache.Variables["treeID_SF"] = treeID;
+	$.cache.Variables["treeNodeID_SF"] = treeID;
 	$.cache.Variables["callback_SF"] = callback;
 	
 	$1("btSearch").onclick = function () {
@@ -614,11 +616,125 @@ function scheduleReport() {
 
 // -------------------------------------------------   配置报表参数   ------------------------------------------------
 function configParams() {
-	// $.showWaitingLayer();
 
 	var rform = $.F("reportForm");
 	var paramsConfig = $.parseJSON(rform.getData("param"));
-	alert(paramsConfig);
+
+	var paramNodes = [];
+	paramsConfig.each(function(index, item){
+		var paramNode = {"id": index, "name": item.label, "value": JSON.stringify(item)};
+		paramNodes.push(paramNode); 
+	});
+
+	var treeData = [{"id": "_root", "name": "报表参数列表", "children": paramNodes}];
+	var paramTree = $.T("paramTree", treeData);	
+	initParamTreeMenus();
+
+	paramTree.onTreeNodeActived = function(event) {
+		if(paramTree.getActiveTreeNode().id != '-1') {
+			editParamConfig();
+		}
+	}
+	paramTree.onTreeNodeRightClick = function(event) {
+		paramTree.el.contextmenu.show(event.clientX, event.clientY);
+	}
+
+	Element.show($1("reportParamsDiv"), 100);
+ 
+}
+
+function initParamTreeMenus() {
+	var paramTree = $.T("paramTree");
+    var item1 = {
+        label:"删除",
+        icon: ICON + "icon_del.gif",
+        callback:function() {
+            paramTree.removeActiveNode();
+        },
+        visible: function() { 
+        	return paramTree.getActiveTreeNode().id != '_root';
+        }
+    }
+    var item2 = {
+        label:"新建参数",
+        callback:function() {
+			var id = $.now();
+			var newNode = {'id': id, 'name': '新增参数', 'value': '{"label":"新增参数"}'};
+			paramTree.addTreeNode(newNode);
+			paramTree.setActiveTreeNode(id);
+			editParamConfig();
+        },
+        visible: function() { 
+        	return paramTree.getActiveTreeNode().id === '_root'; 
+        }
+    }
+ 
+    var menu1 = new $.Menu();
+    menu1.addItem(item2);
+	menu1.addItem(item1);
+    paramTree.el.contextmenu = menu1;
+}
+
+function closeConfigParams() {
+	$("#reportParamsDiv").hide();
+}
+
+var REPORT_PARAM_FIELDS = ['label', 'type', 'nullable', 'defaultValue', 'checkReg', 'width', 'height', 'options', 'multiple', 'onChange'];
+
+function editParamConfig() {
+	var paramTree = $.T("paramTree");
+	var activeNode = paramTree.getActiveTreeNode();
+    var valuesMap = $.parseJSON(paramTree.getActiveTreeNodeAttr("value")) || {};
+    REPORT_PARAM_FIELDS.each(function(i, field){
+    	var fieldEl = $1("_" + field);
+    	var fieldValue = valuesMap[field] || '';
+
+	    if(field === 'width' || field === 'height') { 
+	    	fieldValue = fieldValue ? fieldValue : (field === 'width' ? 250 : 18)
+	    	$('#_' + field + '_').html(fieldValue);
+			
+			fieldEl.onchange = function() {
+				$('#_' + field + '_').html(this.value);
+			}
+		}
+		fieldEl.value = fieldValue;
+
+    	fieldEl.onblur = function() {
+    		var newValue = fieldEl.value;
+    		valuesMap[field] = newValue;
+
+    		if(field === 'label') {
+				activeNode.attrs[field] = newValue;
+				activeNode.li.a.title = newValue;
+				$(activeNode.li.a).html(newValue);
+    		}
+    		if(field === 'options' && newValue) {
+    			newValue = newValue.replace(/，/ig, ',') // 替换中文逗号
+    			if(newValue.indexOf('|') < 0 && newValue.indexOf(',') < 0) {
+    				delete valuesMap['options'];
+    				valuesMap['jsonUrl'] = newValue;
+    			}
+    			else {
+	    			delete valuesMap['jsonUrl'];
+	    			valuesMap['options'] = newValue;
+	    		}
+    		} 
+    		
+    		activeNode.setAttribute("value", JSON.stringify(valuesMap));
+    	}
+    });
+}
+
+function saveConfigParams() {
+	var result = [];
+	var paramNodes = $.T("paramTree").getAllNodes();
+	paramNodes.each(function(i, node){
+		var valuesMap = node.attrs["value"] || {};
+		result.push( $.parseJSON(valuesMap) );
+	});
+
+	var formatResult = JSON.stringify(result).replace(/\"/g, "'").replace(/\{'label/g, "\n {'label");
+	$.F("reportForm").updateDataExternal("param", formatResult.replace(/\}]/g, "}\n]"));
 }
 
 // ------------------------------------------------- 多级下拉选择联动 ------------------------------------------------

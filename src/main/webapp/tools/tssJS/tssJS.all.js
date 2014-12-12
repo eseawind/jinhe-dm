@@ -4971,6 +4971,10 @@
                 parent.li.selfIcon.removeClass("folder").addClass("leaf");
             }
         },
+        // 删除当前选中的节点
+        removeActiveNode: function() {
+            this.removeTreeNode(this.getActiveTreeNode());
+        },
 
         /*
          * 移动节点位置。

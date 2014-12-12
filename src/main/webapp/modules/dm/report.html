@@ -25,10 +25,10 @@
   #reportFormDiv { width: 78%; height: 500; padding: 10px; }
   #scheduleFormDiv { width: 50%; padding: 10px;}
 
-#reportParamsDiv { width: 466px; height: 350px; padding: 5px; }
-#reportParamsDiv Tree\:Box, #reportParamsDiv form { background-color:#fff; display:inline-block; height:337px; }
-#reportParamsDiv Tree\:Box { width:150px; }
-#reportParamsDiv form { width:281px; padding:5px; position: absolute; top: 5px; left: 177px;}
+#reportParamsDiv { width: 466px; height: 300px; padding: 5px; }
+#reportParamsDiv Tree\:Box, #reportParamsDiv form { background-color:#fff; display:inline-block; }
+#reportParamsDiv Tree\:Box { width:152px; height:250px; overflow-y: auto; }
+#reportParamsDiv form { width:285px; height:290px; padding:5px; position:absolute; top:5px; left:176px; }
 
 #reportParamsDiv .required {
     color: red;
@@ -61,7 +61,7 @@
     border-radius: 3px;
 }
 hr { height:4px; border:none; border-top: 1px dashed #555555; }
-#reportParamsDiv .bts { margin: 10px 10px 10px 60px; }
+#reportParamsDiv .bts { margin-left:10px; padding-top:3px; position:absolute; top:270px; left:0; }
 
 </style>
 
@@ -148,41 +148,40 @@ hr { height:4px; border:none; border-top: 1px dashed #555555; }
 <div id="reportParamsDiv" class="dialog Formbox">
 	<Tree:Box id="paramTree" moveable="true"></Tree:Box>
 	<form id="paramForm">
-		<label>参数名称：</label><input type="text" id="paramLabel" /><em class="required">*</em>
+		<label>参数名称：</label><input type="text" id="_label" /><em class="required">*</em>
 		<br><label>参数类型：</label>
-		<select id="paramType">
+		<select id="_type">
 			<option value="string">字符串</option>
 			<option value="number">数字</option>
 			<option value="date">日期</option>
 			<option value="datetime">日期时间</option>
 		</select> 
 		<br><label>是否必填：</label>
-		<select id="paramNullable">
+		<select id="_nullable">
 			<option value="false">是</option>
-			<option value="false">否</option>
+			<option value="true">否</option>
 		</select>  
-		<br><label>默认值：</label><input type="text" id="paramLabel" placeholder="为参数添加一个默认值"/>
-		<br><label>校验正则：</label><input type="text" id="paramCheckReg" />
+		<br><label>默认值：</label><input type="text" id="_defaultValue" placeholder="为参数添加一个默认值"/>
+		<br><label>校验正则：</label><input type="text" id="_checkReg" />
 		
 		<br><label>宽度：</label> 
-		<input type="range" min="100" max="350" value="250" step="10" onchange="$('#paramWidth').html(this.value)"/><span id="paramWidth">250</span>px
+		<input type="range" id="_width" min="100" max="350" value="250" step="10"/><span id="_width_">250</span>px
 		<br><label>高度：</label>
-		<input type="range" min="18" max="180" value="18" step="1" onchange="$('#paramHeight').html(this.value)"/><span id="paramHeight">18</span>px
+		<input type="range" id="_height" min="18" max="180" value="18" step="1"/><span id="_height_">18</span>px
 		
 		<hr>
-		<label>下拉列表：</label><input type="text" id="paramOption" placeholder="格式：1|2|3, 周一|周二|周三"/>
+		<label>下拉列表：</label><input type="text" id="_options" placeholder="格式：1|2, A|B 或 jsonUrl"/>
 		<br><label>是否多选：</label>
-		<select id="paramMultiple">
-			<option value="false">是</option>
+		<select id="_multiple">
+			<option value="true">是</option>
 			<option value="false">否</option>
 		</select> 
-		<br><label>联动方法：</label><input type="text" id="paramOnChange" />
-
-		<div class="bts">
-			<input type="button" class="btStrong" value="完成" id="reportParamsSave"/>
-			<input type="button" class="btWeak" value="关闭" id="closeReportParamsForm"/>
-		</div>
+		<br><label>联动方法：</label><input type="text" id="_onChange" />
 	</form>
+	<div class="bts">
+		<input type="button" class="btStrong" value="完成" onclick="saveConfigParams()"/>
+		<input type="button" class="btWeak" value="关闭" onclick="closeConfigParams()"/>
+	</div>
 </div>
 
 <iframe id="downloadFrame" style="display:none"></iframe>

@@ -674,7 +674,7 @@ function checkPasswordSecurityLevel(formObj, url, password, loginName) {
 }
 
 /*********************** 临时 公用函数 **********************************/
-Element.show = function(element) {
+Element.show = function(element, opacity) {
 	if(element) {
 		element.style.display = "block"; 
 		element.style.position = "absolute";  
@@ -682,7 +682,7 @@ Element.show = function(element) {
 		element.style.top  = "70px";    
 		element.style.zIndex = "999"; 
 	
-		$.setOpacity(element, 95);
+		$.setOpacity(element, opacity || 95);
 	}
 }, 
 

@@ -163,20 +163,21 @@ hr { height:4px; border:none; border-top: 1px dashed #555555; }
 		</select>  
 		<br><label>默认值：</label><input type="text" id="_defaultValue" placeholder="为参数添加一个默认值"/>
 		<br><label>校验正则：</label><input type="text" id="_checkReg" />
-		
+
 		<br><label>宽度：</label> 
 		<input type="range" id="_width" min="100" max="350" value="250" step="10"/><span id="_width_">250</span>px
 		<br><label>高度：</label>
 		<input type="range" id="_height" min="18" max="180" value="18" step="1"/><span id="_height_">18</span>px
-		
+				
 		<hr>
-		<label>下拉列表：</label><input type="text" id="_options" placeholder="格式：1|2, A|B 或 jsonUrl"/>
+		<label>下拉列表：</label><input type="text" id="_options" placeholder="格式：1|2, A|B 或 数据服务地址"/>
 		<br><label>是否多选：</label>
 		<select id="_multiple">
 			<option value="true">是</option>
 			<option value="false">否</option>
 		</select> 
 		<br><label>联动方法：</label><input type="text" id="_onChange" />
+
 	</form>
 	<div class="bts">
 		<input type="button" class="btStrong" value="完成" onclick="saveConfigParams()"/>

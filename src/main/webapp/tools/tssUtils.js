@@ -1,7 +1,7 @@
 
 /*********************** 系统配置 开始 **********************************/
  var
-	IS_TEST = true,
+	IS_TEST = false,
 
 	FROMEWORK_CODE = "TSS",    /* 当前框架名 */
 	APP_CODE       = "DMS";    /* 当前应用名 */

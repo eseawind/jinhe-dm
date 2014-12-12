@@ -618,7 +618,7 @@ function scheduleReport() {
 function configParams() {
 
 	var rform = $.F("reportForm");
-	var paramsConfig = $.parseJSON(rform.getData("param"));
+	var paramsConfig = $.parseJSON(rform.getData("param")) || [];
 
 	var paramNodes = [];
 	paramsConfig.each(function(index, item){
@@ -637,6 +637,22 @@ function configParams() {
 	}
 	paramTree.onTreeNodeRightClick = function(event) {
 		paramTree.el.contextmenu.show(event.clientX, event.clientY);
+	}
+	paramTree.onTreeNodeMoved = function(event) {
+		event.ownTree.sortTreeNode(event.dragNode, event.destNode);
+	}
+
+	// 默认选中第一个参数，如果没有则清空表单
+	var paramNodeIds = paramTree.getAllNodeIds();
+	if(paramNodeIds.length > 0) {
+		paramTree.setActiveTreeNode(paramNodeIds[0]);
+		editParamConfig();
+	}
+	else {
+		REPORT_PARAM_FIELDS.each(function(i, field){
+    		var fieldEl = $1("_" + field);
+    		fieldEl.value = '';
+    	});
 	}
 
 	Element.show($1("reportParamsDiv"), 100);
@@ -699,6 +715,14 @@ function editParamConfig() {
 		}
 		fieldEl.value = fieldValue;
 
+	    if(field === 'multiple' && fieldValue == "true") {
+		    if(fieldValue == "true") {
+				$1("_height").removeAttribute("readonly");
+			} else {
+				$1("_height").setAttribute("readonly", "readonly");
+			}
+		}
+
     	fieldEl.onblur = function() {
     		var newValue = fieldEl.value;
     		valuesMap[field] = newValue;
@@ -719,7 +743,19 @@ function editParamConfig() {
 	    			valuesMap['options'] = newValue;
 	    		}
     		} 
-    		
+
+    		if(field === 'multiple') {
+    			if(newValue == "true") {
+    				$1("_height").removeAttribute("readonly");
+    			} else {
+    				$1("_height").setAttribute("readonly", "readonly");
+    			}
+    		}
+    		if(field === 'type') {
+    			if(newValue == "date" || newValue == "datetime") {
+    				$1("_defaultValue").setAttribute("placeholder", "日期类型示例：today-3");
+    			}
+    		}
     		activeNode.setAttribute("value", JSON.stringify(valuesMap));
     	}
     });

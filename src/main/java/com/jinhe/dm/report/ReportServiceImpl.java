@@ -161,7 +161,13 @@ public class ReportServiceImpl implements ReportService {
 
 				String paramValue = requestMap.get(paramKy).trim();
 				Object paramType = map.get("type");
-				Object isMacrocode = map.get("isMacrocode");
+				Object isMacrocode = map.get("isMacrocode"); // 如一些只用于多级下拉联动的参数，可能并不用于script
+				
+				// 判断是否作为宏定义用于freemarker的模板解析
+				if ( reportScript.indexOf(" ${" + paramKy + "}") > 0 || 
+						reportScript.indexOf("if " + paramKy) > 0 ) {
+					isMacrocode = "true";		
+				}
 				
 				// 将相对时间解析成绝对时间（today - 2 --> 2014-7-20）
 				if (Pattern.compile("^today[\\s]*-[\\s]*\\d{1,4}").matcher(paramValue).matches()) {
@@ -177,7 +183,7 @@ public class ReportServiceImpl implements ReportService {
 					paramValue = SOUtil.insertSingleQuotes(paramValue);
 				}
 				// 判断参数是否只用于freemarker解析
-				else if (!"true".equals(isMacrocode)) {
+				else if ( !"true".equals(isMacrocode) ) {
 					Object value = preTreatParamValue(paramValue, paramType);
 					paramsMap.put(paramsMap.size() + 1, value);
 				}
@@ -213,7 +219,7 @@ public class ReportServiceImpl implements ReportService {
   		if("number".equals(paramType)) {
   			return EasyUtils.convertObject2Integer(paramValue);
   		}
-  		else if("date".equals(paramType)) {
+  		else if("date".equals(paramType) || "datetime".equals(paramType)) {
 			try {
 				Date dateObj = DateUtil.parse(paramValue);
 				return new java.sql.Timestamp(dateObj.getTime());

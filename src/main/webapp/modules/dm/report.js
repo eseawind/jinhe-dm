@@ -198,7 +198,6 @@ function loadReportDetail(isCreate, readonly, type) {
 	var treeNodeID = treeNode.id;
 	type = type || treeNode.getAttribute("type") ;
 	
-	delete $.cache.Variables["treeNodeID_SF"];
 	$("#searchFormDiv").hide();
 	Element.show($1("reportFormDiv"));
 	
@@ -256,7 +255,9 @@ function saveReport(treeNodeID) {
 	}
 	request.onsuccess = function() { // 更新
 		modifyTreeNode(treeNodeID, "name", xform.getData("name"));
+		modifyTreeNode(treeNodeID, "param", xform.getData("param"));
 		closeReportFormDiv();
+		delete $.cache.Variables["treeNodeID_SF"];
 	}
 	request.send();
 }
@@ -616,7 +617,6 @@ function scheduleReport() {
 
 // -------------------------------------------------   配置报表参数   ------------------------------------------------
 function configParams() {
-
 	var rform = $.F("reportForm");
 	var paramsConfig = $.parseJSON(rform.getData("param")) || [];
 
@@ -695,7 +695,7 @@ function closeConfigParams() {
 	$("#reportParamsDiv").hide();
 }
 
-var REPORT_PARAM_FIELDS = ['label', 'type', 'nullable', 'defaultValue', 'checkReg', 'width', 'height', 'options', 'multiple', 'onChange'];
+var REPORT_PARAM_FIELDS = ['label', 'type', 'nullable', 'defaultValue', 'checkReg', 'width', 'height', 'options', 'multiple', 'onChange', 'isMacrocode'];
 
 function editParamConfig() {
 	var paramTree = $.T("paramTree");
@@ -705,8 +705,34 @@ function editParamConfig() {
     	var fieldEl = $1("_" + field);
     	var fieldValue = valuesMap[field] || '';
 
+		if(field === 'type') {
+			fieldValue = fieldValue.toLowerCase();
+			if(fieldValue == "date" || fieldValue == "datetime") {
+				$("#selectRelation").css("display", "none");
+			}
+			else {
+				$("#selectRelation").css("display", "block");
+			}
+		}
+
+		if( field === 'options' ) {
+			if(fieldValue.codes) {
+				fieldValue = fieldValue.codes + ',' + fieldValue.names;
+			}
+			else if( valuesMap['jsonUrl'] ) {
+				fieldValue = valuesMap['jsonUrl']
+			}
+		}
+		if(field === 'multiple') {
+		    if(fieldValue == "true") {
+				$1("_height").removeAttribute("readonly");
+			} else {
+				$1("_height").setAttribute("readonly", "readonly");
+			}
+		}
+
 	    if(field === 'width' || field === 'height') { 
-	    	fieldValue = fieldValue ? fieldValue : (field === 'width' ? 250 : 18)
+	    	fieldValue = fieldValue ? fieldValue.replace('px', '') : (field === 'width' ? 250 : 18)
 	    	$('#_' + field + '_').html(fieldValue);
 			
 			fieldEl.onchange = function() {
@@ -715,17 +741,17 @@ function editParamConfig() {
 		}
 		fieldEl.value = fieldValue;
 
-	    if(field === 'multiple' && fieldValue == "true") {
-		    if(fieldValue == "true") {
-				$1("_height").removeAttribute("readonly");
-			} else {
-				$1("_height").setAttribute("readonly", "readonly");
-			}
-		}
-
     	fieldEl.onblur = function() {
     		var newValue = fieldEl.value;
-    		valuesMap[field] = newValue;
+			if( $.isNullOrEmpty(newValue) ) {
+				if(field === 'label') {
+					return alert("参数名称不能为空");
+				}
+				delete valuesMap[field];
+			}
+			else {
+				valuesMap[field] = newValue;
+			}			
 
     		if(field === 'label') {
 				activeNode.attrs[field] = newValue;
@@ -740,7 +766,9 @@ function editParamConfig() {
     			}
     			else {
 	    			delete valuesMap['jsonUrl'];
-	    			valuesMap['options'] = newValue;
+					var tmpArray = newValue.split(",");
+					var names = (tmpArray.length > 1 ? tmpArray[1] : tmpArray[0]);
+	    			valuesMap['options'] = {"codes": tmpArray[0], "names": names};
 	    		}
     		} 
 
@@ -749,12 +777,19 @@ function editParamConfig() {
     				$1("_height").removeAttribute("readonly");
     			} else {
     				$1("_height").setAttribute("readonly", "readonly");
+					$1("_height").value = 18;
+					$('#_height_').html('18');
+					delete valuesMap['height'];
     			}
     		}
     		if(field === 'type') {
     			if(newValue == "date" || newValue == "datetime") {
     				$1("_defaultValue").setAttribute("placeholder", "日期类型示例：today-3");
+					$("#selectRelation").css("display", "none");
     			}
+				else {
+					$("#selectRelation").css("display", "block");
+				}
     		}
     		activeNode.setAttribute("value", JSON.stringify(valuesMap));
     	}
@@ -765,11 +800,11 @@ function saveConfigParams() {
 	var result = [];
 	var paramNodes = $.T("paramTree").getAllNodes();
 	paramNodes.each(function(i, node){
-		var valuesMap = node.attrs["value"] || {};
-		result.push( $.parseJSON(valuesMap) );
+		var valuesMap = $.parseJSON(node.attrs["value"] || '{}');
+		result.push( valuesMap );
 	});
 
-	var formatResult = JSON.stringify(result).replace(/\"/g, "'").replace(/\{'label/g, "\n {'label");
+	var formatResult = JSON.stringify(result).replace(/\"/g, "'").replace(/\{'label/g, "\n  {'label");
 	$.F("reportForm").updateDataExternal("param", formatResult.replace(/\}]/g, "}\n]"));
 }
 

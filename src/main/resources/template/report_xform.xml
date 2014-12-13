@@ -27,7 +27,10 @@
 			<TD><textarea binding="script" style="width:98%;height:250px"/></TD>
 		</TR>
 		<TR>
-			<TD valign="top"><label binding="param"/></TD>
+			<TD valign="top">
+				<label binding="param"/><br/><br/>
+				<input type="button" value="配置" onclick="configParams()" class="btStrong"/>
+			</TD>
 			<TD><textarea binding="param" style="width:98%;height:100px"/></TD>
 		</TR>
 		<TR>

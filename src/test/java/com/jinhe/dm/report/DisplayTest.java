@@ -27,7 +27,7 @@ public class DisplayTest extends TxTestSupport {
         report1.setName("report-1");
         report1.setScript(" select id, name from dm_report " +
         		" where id > ? " +
-        		"  <#if param2??> and type <> ? <#else> and type = 1 </#if> " +
+        		"  <#if param2??> and type <> ${param2} <#else> and type = 1 </#if> " +
         		"  and (createTime > ? or createTime > ?) " +
         		"  and name in (${param5})");
         
@@ -96,7 +96,7 @@ public class DisplayTest extends TxTestSupport {
         report1.setName("report-1");
         report1.setScript(" select id, name from dm_report " +
         		" where id > ? " +
-        		"  <#if param2??> and type <> ? <#else> and type = 1 </#if> " +
+        		"  <#if param2??> and type <> ${param2} <#else> and type = 1 </#if> " +
         		"  and (createTime > ? or createTime > ?) " +
         		"  and name in (${param5})");
         

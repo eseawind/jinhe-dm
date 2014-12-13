@@ -32,7 +32,7 @@
 				<TR>
 					<TD valign="top">
 						<label binding="param"/><br/><br/>
-						<input type="button" value="配置" onclick="configParams()" class="btWeak"/>
+						<input type="button" value="配置" onclick="configParams()" class="btStrong"/>
 					</TD>
 					<TD><textarea binding="param" style="width:99%;height:100px"/></TD>
 				</TR>

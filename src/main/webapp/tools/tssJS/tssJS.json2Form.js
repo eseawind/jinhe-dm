@@ -31,23 +31,22 @@
 			this.height = this.height.trim() + "px";
 		}
 
-		switch(this.type.toLowerCase()) {
+		this.mode = this.type.toLowerCase();
+		switch(this.mode) {
 			case "number":
-				this.mode = "number";
 				this.checkReg = this.checkReg || "/^[0-9]*[1-9][0-9]*$/";
 				break;
 			case "string":
-				this.mode = "string";
 				break;
 			case "date":
-				this.mode = "date";
+			case "datetime":
 				this.width = "200px";
 				var defaultValue = this.defaultValue;
 				if( defaultValue && (/today[\s]*-/gi).test(defaultValue) ) {
 					var deltaDays = parseInt(defaultValue.split("-")[1]);
 					var today = new Date();
 					today.setDate(today.getDate() - deltaDays);
-					this.defaultValue = today.format('yyyy-MM-dd');
+					this.defaultValue = today.format('yyyy-MM-dd') + (this.mode == "datetime" ? " 00:00:00" : "");
 				} 
 				break;
 		}

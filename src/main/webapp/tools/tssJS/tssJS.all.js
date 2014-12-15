@@ -21,9 +21,6 @@
         // The deferred used on DOM ready
         readyList = [],
 
-        // Check if a string has a non-whitespace character in it
-        rnotwhite = /\S/,
-
         // Used for trimming whitespace
         trimLeft = /^\s+/,
         trimRight = /\s+$/,
@@ -33,9 +30,7 @@
 
         toString = Object.prototype.toString,
         trim = String.prototype.trim,
-        push    = Array.prototype.push,
-        slice   = Array.prototype.slice,     
-        indexOf = Array.prototype.indexOf,
+        push = Array.prototype.push,    
 
         ua = navigator.userAgent.toLowerCase(),
         mc = function(e) {
@@ -1114,140 +1109,6 @@
 
 
 
-;(function($){
-    /*
-     *  大数据显示进度
-     *  参数： string:url                    同步进度请求地址
-            xmlNode:data                    
-            string:cancelUrl                取消进度请求地址
-     */
-    var Progress = function(url, data, cancelUrl) {
-        this.progressUrl = url;
-        this.cancelUrl = cancelUrl;
-        this.refreshData(data);
-    };
-
-    Progress.prototype = {
-        /* 更新数据 */
-        refreshData: function(data) {
-            this.percent      = $.XML.getText(data.querySelector("percent"));
-            this.delay        = $.XML.getText(data.querySelector("delay"));
-            this.estimateTime = $.XML.getText(data.querySelector("estimateTime"));
-            this.code         = $.XML.getText(data.querySelector("code"));
-
-            var feedback = data.querySelector("feedback");
-            if( feedback ) {
-                alert($.XML.getText(feedback));
-            }
-        },
-
-        /* 开始执行  */
-        start: function() {
-            this.show();
-            this.next();
-        },
-
-        /* 停止执行  */
-        stop: function() {
-            var pThis = this;
-            $.ajax({
-                url: this.cancelUrl + pThis.code,
-                method: "DELETE",
-                onsuccess: function() {
-                    pThis.hide();
-                    clearTimeout(pThis.timeout);
-                }
-            });
-        },
-
-        /* 显示进度  */
-        show: function() {
-            var pThis = this;
-
-            var graph = $(".progressBar")[0];
-            if(graph == null) {
-                graph = $.createElement("div", "progressBar");
-                $(graph).center(500, 50).css("width", "600px").css("color", "#fff").css("fontSize", "16px").css("fontWeight", "bold");
-
-                var bar = $.createElement("div", "bar");
-                $(bar).css("backgroundColor", "#e0f6c8").css("border", "1px solid #F8B3D0") ;  
-
-                var passBar = $.createElement("div", "passBar");
-                $(passBar).css("backgroundColor", "#009966").html("1212").css("textAlign", "center");    
-                
-                graph.appendChild(bar);
-                bar.appendChild(passBar);  
-
-                var info = $.createElement("span", "info");
-                $(info).html("剩余时间: <span>1</span>秒").css("padding", "5px 0 0 120px").css("color", "grey").css("fontSize", "14px");
-
-                var cancel = $.createElement("span");
-                $(cancel).html("<a href='#'>取 消</a>").css("padding", "5px 0 0 80px").css("fontSize", "14px")
-                    .click(function() { pThis.stop(); });
-
-                graph.appendChild(info);
-                graph.appendChild(cancel);
-                document.body.appendChild(graph);
-            }
-
-            // this.percent = Math.round(Math.random() * 100); // just for test
-            $(".passBar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
-            $(".info span", graph).html(this.estimateTime); 
-        },
-
-        /* 隐藏进度 */
-        hide: function() {
-            $(".progressBar").each(function(i, el) {
-                $.removeNode(el);
-            })
-        },
-
-        /* 同步进度  */
-        sync: function() {
-            var pThis = this;
-            $.ajax({
-                url: this.progressUrl + this.code,
-                method: "GET",
-                async: false,
-                onresult: function() {
-                    var data = this.getNodeValue("ProgressInfo");
-                    pThis.refreshData(data);
-                    pThis.show();
-                    pThis.next();
-                },
-                onexception: function() {
-                    pThis.hide();
-                }
-            });
-        },
-
-        /* 延时进行下一次同步  */
-        next: function() {
-            var pThis = this;
-
-            var percent = parseInt(this.percent);
-            var delay   = parseInt(this.delay) * 1000;
-            if(100 > percent) {
-                this.timeout = setTimeout(function() {
-                    pThis.sync();
-                }, delay);
-            }
-            else if( this.oncomplete ) {
-                setTimeout(function() {
-                    pThis.hide();
-                    pThis.oncomplete();
-                }, 200);
-            }
-        }
-    }
-
-    $.Progress = Progress;
-
-})(tssJS);
-
-
-
-
 /*
     $.ajax({
         url : url,
@@ -1787,6 +1648,7 @@
 
             var loginNameObj = $("#loginName")[0];
             var passwordObj  = $("#password")[0];
+
             loginNameObj.focus();
             passwordObj.value = ""; // 清空上次输入的密码，以防泄密
             
@@ -1858,6 +1720,138 @@
 
     return HttpRequest;
 });
+
+
+;(function($){
+    /*
+     *  大数据显示进度
+     *  参数： string:url                    同步进度请求地址
+            xmlNode:data                    
+            string:cancelUrl                取消进度请求地址
+     */
+    var Progress = function(url, data, cancelUrl) {
+        this.progressUrl = url;
+        this.cancelUrl = cancelUrl;
+        this.refreshData(data);
+    };
+
+    Progress.prototype = {
+        /* 更新数据 */
+        refreshData: function(data) {
+            this.percent      = $.XML.getText(data.querySelector("percent"));
+            this.delay        = $.XML.getText(data.querySelector("delay"));
+            this.estimateTime = $.XML.getText(data.querySelector("estimateTime"));
+            this.code         = $.XML.getText(data.querySelector("code"));
+
+            var feedback = data.querySelector("feedback");
+            if( feedback ) {
+                alert($.XML.getText(feedback));
+            }
+        },
+
+        /* 开始执行  */
+        start: function() {
+            this.show();
+            this.next();
+        },
+
+        /* 停止执行  */
+        stop: function() {
+            var pThis = this;
+            $.ajax({
+                url: this.cancelUrl + pThis.code,
+                method: "DELETE",
+                onsuccess: function() {
+                    pThis.hide();
+                    clearTimeout(pThis.timeout);
+                }
+            });
+        },
+
+        /* 显示进度  */
+        show: function() {
+            var pThis = this;
+
+            var graph = $(".progressBar")[0];
+            if(graph == null) {
+                graph = $.createElement("div", "progressBar");
+                $(graph).center(500, 50).css("width", "600px").css("color", "#fff").css("fontSize", "16px").css("fontWeight", "bold");
+
+                var bar = $.createElement("div", "bar");
+                $(bar).css("backgroundColor", "#e0f6c8").css("border", "1px solid #F8B3D0") ;  
+
+                var passBar = $.createElement("div", "passBar");
+                $(passBar).css("backgroundColor", "#009966").html("1212").css("textAlign", "center");    
+                
+                graph.appendChild(bar);
+                bar.appendChild(passBar);  
+
+                var info = $.createElement("span", "info");
+                $(info).html("剩余时间: <span>1</span>秒").css("padding", "5px 0 0 120px").css("color", "grey").css("fontSize", "14px");
+
+                var cancel = $.createElement("span");
+                $(cancel).html("<a href='#'>取 消</a>").css("padding", "5px 0 0 80px").css("fontSize", "14px")
+                    .click(function() { pThis.stop(); });
+
+                graph.appendChild(info);
+                graph.appendChild(cancel);
+                document.body.appendChild(graph);
+            }
+
+            // this.percent = Math.round(Math.random() * 100); // just for test
+            $(".passBar", graph).css("width", this.percent + "%").html(this.percent + "%"); 
+            $(".info span", graph).html(this.estimateTime); 
+        },
+
+        /* 隐藏进度 */
+        hide: function() {
+            $(".progressBar").each(function(i, el) {
+                $.removeNode(el);
+            })
+        },
+
+        /* 同步进度  */
+        sync: function() {
+            var pThis = this;
+            $.ajax({
+                url: this.progressUrl + this.code,
+                method: "GET",
+                async: false,
+                onresult: function() {
+                    var data = this.getNodeValue("ProgressInfo");
+                    pThis.refreshData(data);
+                    pThis.show();
+                    pThis.next();
+                },
+                onexception: function() {
+                    pThis.hide();
+                }
+            });
+        },
+
+        /* 延时进行下一次同步  */
+        next: function() {
+            var pThis = this;
+
+            var percent = parseInt(this.percent);
+            var delay   = parseInt(this.delay) * 1000;
+            if(100 > percent) {
+                this.timeout = setTimeout(function() {
+                    pThis.sync();
+                }, delay);
+            }
+            else if( this.oncomplete ) {
+                setTimeout(function() {
+                    pThis.hide();
+                    pThis.oncomplete();
+                }, 200);
+            }
+        }
+    }
+
+    $.Progress = Progress;
+
+})(tssJS);
 
 
 
@@ -2374,21 +2368,6 @@
     'use strict';
 
     var  document = window.document,
-
-    fireEvent = function(el, eventName, data) {
-        var ev;
-
-        if (document.createEvent) {
-            ev = document.createEvent('HTMLEvents');
-            ev.initEvent(eventName, true, false);
-            ev = extend(ev, data);
-            el.dispatchEvent(ev);
-        } else if (document.createEventObject) {
-            ev = document.createEventObject();
-            ev = extend(ev, data);
-            el.fireEvent('on' + eventName, ev);
-        }
-    },
  
     isDate = function(obj) {
         return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
@@ -2402,12 +2381,35 @@
         return [31, (isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
     },
 
+    getSelectdTime = function($ranges) {
+        if($ranges == null || $ranges.length < 3) return "00:00:00";
+
+        var _hour   = $ranges[0].value;
+        var _minute = $ranges[1].value;
+        var _second = $ranges[2].value;
+        _hour = _hour.length == 1 ? "0" + _hour : _hour;
+        _minute = _minute.length == 1 ? "0" + _minute : _minute;
+        _second = _second.length == 1 ? "0" + _second : _second;
+
+        return _hour + ":" + _minute + ":" + _second;
+    },
+
+    setSelectdTime = function($ranges, self) {
+        $ranges[0].value = self._hour || 0;
+        $ranges[1].value = self._minute || 0;
+        $ranges[2].value = self._second || 0;
+
+        $('.timeAera .range1', self.el).html( self._hour || '00');
+        $('.timeAera .range2', self.el).html( self._minute || '00');
+        $('.timeAera .range3', self.el).html( self._second || '00');
+    },
+
     setToStartOfDay = function(date) {
-        if ( isDate(date) )  date.setHours(0, 0, 0, 0);
+        if ( isDate(date) )  date.setHours(0, 0, 0, 0); // 对时分秒进行清零
     },
 
     compareDates = function(a, b) {
-        return a.getTime() === b.getTime();
+        return a.format('yyyy-MM-dd') === b.format('yyyy-MM-dd');
     },
 
     extend = function(to, from, overwrite) {
@@ -2444,7 +2446,10 @@
         position: 'bottom left',
 
         // the default output format for `.toString()` and `field` value
-        format: 'YYYY-MM-DD',
+        format: 'yyyy-MM-dd',
+
+        // hh:mi:ss
+        careTime: false,
 
         // the initial date to view when first opened
         defaultDate: null,
@@ -2486,8 +2491,7 @@
         // callback function
         onSelect: null,
         onOpen: null,
-        onClose: null,
-        onDraw: null
+        onClose: null
     },
 
 
@@ -2594,6 +2598,17 @@
         return '<table class="pika-table">' + renderHead(opts) + renderBody(data) + '</table>';
     },
 
+    renderTime = function(opts, time) {
+        var html = [];
+        html.push('<div class="timeAera">');
+        html.push('时：<input type="range" min="0" max="23" value="0" step="1" onchange="$(\'.range1\', this.parentNode).html(this.value);" /><span class="range1">00</span><br/>');
+        html.push('分：<input type="range" min="0" max="59" value="0" step="1" onchange="$(\'.range2\', this.parentNode).html(this.value);" /><span class="range2">00</span><br/>');
+        html.push('秒：<input type="range" min="0" max="59" value="0" step="1" onchange="$(\'.range3\', this.parentNode).html(this.value);" /><span class="range3">00</span><br/>');
+        html.push('<button type="button">确定</button>');
+        html.push('</div>');
+        return html.join("\n");
+    },
+
 
     /**  JCalendar constructor */
     JCalendar = function(options) {
@@ -2607,12 +2622,23 @@
             var target = e.target || e.srcElement;
             if (!target) return;
 
+            if ( target.parentNode && $.hasClass(target.parentNode, 'timeAera') ) {
+                self._c = true;
+                return;
+            }
+
             if (!$.hasClass(target, 'is-disabled')) {
                 if ($.hasClass(target, 'pika-button') && !$.hasClass(target, 'is-empty')) {
-                    self.setDate(new Date(self._y, self._m, parseInt(target.innerHTML, 10)));
-                        window.setTimeout(function() {
-                            self.hide();
-                        }, 100);
+                    var selectedDate = new Date(self._y, self._m, parseInt(target.innerHTML, 10));
+
+                    if( opts.careTime ) {
+                        selectedDate.setHours(self._hour||0, self._minute||0, self._second||0, 0)
+                    }
+                    else {
+                        window.setTimeout(function() { self.hide(); }, 100);
+                    }
+                    self.setDate(selectedDate);
+ 
                     return;
                 }
                 else if ($.hasClass(target, 'pika-prev')) {
@@ -2623,12 +2649,7 @@
                 }
             }
             if (!$.hasClass(target, 'pika-select')) {
-                if (e.preventDefault) {
-                    e.preventDefault();
-                } else {
-                    e.returnValue = false;
-                    return false;
-                }
+                $.Event.cancel(e);
             } else {
                 self._c = true;
             }
@@ -2666,7 +2687,7 @@
         };
 
         self._onInputBlur = function() {
-            if (!self._c) {
+            if (!self._c && !opts.careTime) {
                 self._b = window.setTimeout(function() {
                     self.hide();
                 }, 50);
@@ -2694,7 +2715,7 @@
             }
             while ((pEl = pEl.parentNode));
 
-            if (self._v && target !== opts.trigger) {
+            if (self._v && target !== opts.trigger && !opts.careTime) {
                 self.hide();
             }
         };
@@ -2778,6 +2799,9 @@
                 opts.yearRange = Math.min(opts.yearRange, 50);
             }
 
+            if(opts.careTime) {
+                opts.format += opts.format.length == 10 ? ' hh:mm:ss' : "";
+            }
             return opts;
         },
 
@@ -2812,13 +2836,19 @@
             }
 
             this._d = new Date(date.getTime());
-            setToStartOfDay(this._d);
+            if(!this._o.careTime) {
+                setToStartOfDay(this._d);
+            } else {
+                this._hour = this._d.getHours();
+                this._minute = this._d.getMinutes();
+                this._second= this._d.getSeconds();
+            }
             this.gotoDate(this._d);
 
             if (this._o.field) {
                 this._o.field.value = this.toString();
-                fireEvent(this._o.field, 'change', { firedBy: this });
             }
+
             if (!preventOnSelect && typeof this._o.onSelect === 'function') {
                 this._o.onSelect.call(this, this.getDate());
             }
@@ -2890,19 +2920,33 @@
             }
 
             this.el.innerHTML = renderTitle(this) + this.render(this._y, this._m);
+            if(opts.careTime) {
+                this.el.innerHTML += renderTime(opts);
+                var self = this;
+                var $ranges = $('.timeAera input', self.el);
+                setSelectdTime($ranges, self);
+
+                $('.timeAera button', self.el).click(function(){
+                    var _time = getSelectdTime( $ranges );
+                    if( $.isNullOrEmpty(self._o.field.value) ) {
+                        self._o.field.value = new Date().format(opts.format);
+                    }
+                    self._o.field.value = self._o.field.value.split(" ")[0] + " " + _time;
+
+                    var date = new Date(Date.parse(opts.field.value));
+                    self._hour = date.getHours();
+                    self._minute = date.getMinutes();
+                    self._second = date.getSeconds();
+
+                    self.hide();
+                });
+            }
 
             this.adjustPosition();
             if(opts.field.type !== 'hidden') {
                 window.setTimeout(function() {
                     opts.trigger.focus();
                 }, 1);
-            }
-
-            if (typeof this._o.onDraw === 'function') {
-                var self = this;
-                window.setTimeout(function() {
-                    self._o.onDraw.call(self);
-                }, 0);
             }
         },
 
@@ -2998,6 +3042,7 @@
                 $(this.el).removeClass('is-hidden');
                 this._v = true;
                 this.draw();
+
                 if (typeof this._o.onOpen === 'function') {
                     this._o.onOpen.call(this);
                 }
@@ -3011,6 +3056,7 @@
                 this.el.style.cssText = '';
                 $(this.el).addClass('is-hidden');
                 this._v = false;
+
                 if (v !== undefined && typeof this._o.onClose === 'function') {
                     this._o.onClose.call(this);
                 }
@@ -3037,6 +3083,7 @@
 
     return JCalendar;
 });
+
 
 
 ;(function ($, factory) {
@@ -3232,7 +3279,7 @@
                         else if(mode == "string" && nodeName == 'textarea') {
                             htmls.push("<textarea " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + ">" + (value ? value : "") + "</textarea>");
                         }
-                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date") {
+                        else if(mode == "string" || mode == "number" || mode == "function" || mode == "date" || mode == "datetime") {
                             htmls.push("<input " + copyNodeAttribute(childNode) + copyColumnAttribute(column) + _value + "></input>");
                         }
                     }
@@ -3339,6 +3386,9 @@
                     case "date":
                     case "function":
                         fieldObj = new FunctionField(fieldName, this);
+                        break;
+                    case "datetime":
+                        fieldObj = new FunctionField(fieldName, this, true);
                         break;
                     case "hidden":
                         fieldObj = new HiddenFiled(fieldName, this);
@@ -3540,10 +3590,10 @@
     };
 
     // 自定义方法输入值类型
-    var FunctionField = function(fieldName, form) {
+    var FunctionField = function(fieldName, form, isDatetime) {
         this.el = $$(fieldName);
         this.el._value = this.el.value; // 备份原值
-        this.isdate = (this.el.getAttribute("mode").toLowerCase() == "date");
+        this.isdate = (this.el.getAttribute("mode").toLowerCase() == "date") || isDatetime;
      
         if( !this.el.disabled ) {
             if(this.isdate) {
@@ -3552,9 +3602,10 @@
                         field: $1(this.el.id),
                         firstDay: 1,
                         minDate: new Date('2000-01-01'),
-                        maxDate: new Date('2020-12-31'),
-                        yearRange: [2000,2020],
-                        format: 'yyyy-MM-dd'
+                        maxDate: new Date('2030-12-31'),
+                        yearRange: [2000,2030],
+                        format: 'yyyy-MM-dd',
+                        careTime: isDatetime
                     });
                 }
             }
@@ -3727,6 +3778,7 @@
 
     return Form;
 });
+
 
 
 ;(function ($, factory) {
@@ -5648,65 +5700,3 @@
 
     return WorkSpace;
 }); 
-
-
-;(function($) {
-
-    $.JSONP = {
-        // url组装
-        parseParams: function(data) {
-            var ret = "";
-            if(typeof params === "string") {
-                ret = params;
-            }
-            else if(typeof params === "object") {
-                for(var key in params) {
-                    ret += "&" + key + "=" + encodeURIComponent(params[key]);
-                }
-            }
-
-            // 加个时间戳，防止被缓存
-            ret += "&_time=" + $.now();
-
-            return ret.substr(1);
-        },
-        
-        getJSON: function(url, params, func) {
-            
-            url = url + (url.indexOf("?") === -1 ? "?" : "&") + this.parseParams(params);
-            
-            // 函数名称
-            var name;
-
-            // 检测callback的函数名是否已经定义
-            var match = /jsonpCallback=(\w+)/.exec(url);
-            if(match && match[1]) {
-                name = match[1];
-            } 
-            else { // 如果未定义函数名的话随机成一个函数名
-                name = "jsonp_" + $.getUniqueID();
-                url = url + (url.indexOf("?") === -1 ? "?" : "&") + "jsonpCallback=" + name;
-            }
-            
-            // 创建一个script元素, 插入head
-            var script = $.createElement("script");
-            script.src = url;
-            script.id = name; // 设置id，为了后面可以删除这个元素
-
-            var head = document.head || document.getElementsByTagName('head')[0];
-            head.appendChild(script);
-            
-            // 把传进来的函数重新组装，并把它设置为全局函数，远程就是调用这个函数
-            window[name] = function(json) {   
-                window[name] = undefined; // 执行这个函数后，要销毁这个函数
- 
-                // 删除head里面插入的script，不污染整个DOM
-                $.removeNode($("#" + name)[0]);
-                
-                // 执行传入的的函数
-                func(json);
-            };
-        }
-    }
-
-})(tssJS);

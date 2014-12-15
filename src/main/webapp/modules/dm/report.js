@@ -636,6 +636,9 @@ function configParams() {
 		}
 	}
 	paramTree.onTreeNodeRightClick = function(event) {
+		if(paramTree.getActiveTreeNode().id != '-1') {
+			editParamConfig();
+		}
 		paramTree.el.contextmenu.show(event.clientX, event.clientY);
 	}
 	paramTree.onTreeNodeMoved = function(event) {

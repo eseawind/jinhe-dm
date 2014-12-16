@@ -2687,7 +2687,7 @@
         };
 
         self._onInputBlur = function() {
-            if (!self._c && !opts.careTime) {
+            if ( !self._c ) {
                 self._b = window.setTimeout(function() {
                     self.hide();
                 }, 50);
@@ -2932,6 +2932,7 @@
                         self._o.field.value = new Date().format(opts.format);
                     }
                     self._o.field.value = self._o.field.value.split(" ")[0] + " " + _time;
+                    self._o.field.focus();
 
                     var date = new Date(Date.parse(opts.field.value));
                     self._hour = date.getHours();

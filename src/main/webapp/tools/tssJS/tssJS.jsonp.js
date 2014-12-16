@@ -2,7 +2,7 @@
 
     $.JSONP = {
         // url组装
-        parseParams: function(data) {
+        parseParams: function(params) {
             var ret = "";
             if(typeof params === "string") {
                 ret = params;

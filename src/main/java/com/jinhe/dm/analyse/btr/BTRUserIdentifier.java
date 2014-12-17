@@ -39,6 +39,12 @@ public class BTRUserIdentifier extends BaseUserIdentifier {
         	throw new BusinessException("用户密码不正确，请重新登录", false);
         }
         
+        try {
+        	// 设置一下密码强度，同时也可以将第三方的密码设置到UM中
+        	loginservice.resetPassword(operator.getId(), password); 
+    	} catch(Exception e) {
+    		log.error("resetPassword时出错了：" + e.getMessage());
+    	}
         return operator;
     }
     

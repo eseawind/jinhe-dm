@@ -217,7 +217,7 @@ public class ReportServiceImpl implements ReportService {
   		
   		paramType = paramType.toString().toLowerCase();
   		if("number".equals(paramType)) {
-  			return EasyUtils.convertObject2Integer(paramValue);
+  			return EasyUtils.obj2Int(paramValue);
   		}
   		else if("date".equals(paramType) || "datetime".equals(paramType)) {
 			try {

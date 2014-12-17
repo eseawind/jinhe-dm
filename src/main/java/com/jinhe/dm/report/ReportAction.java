@@ -23,12 +23,17 @@ import com.jinhe.tss.framework.component.param.ParamConstants;
 import com.jinhe.tss.framework.component.param.ParamManager;
 import com.jinhe.tss.framework.component.param.ParamService;
 import com.jinhe.tss.framework.component.timer.SchedulerBean;
+import com.jinhe.tss.framework.exception.BusinessException;
+import com.jinhe.tss.framework.sso.Environment;
+import com.jinhe.tss.framework.sso.IOperator;
 import com.jinhe.tss.framework.web.dispaly.tree.LevelTreeParser;
 import com.jinhe.tss.framework.web.dispaly.tree.StrictLevelTreeParser;
 import com.jinhe.tss.framework.web.dispaly.tree.TreeEncoder;
 import com.jinhe.tss.framework.web.dispaly.xform.XFormEncoder;
 import com.jinhe.tss.framework.web.mvc.BaseActionSupport;
+import com.jinhe.tss.um.helper.PasswordRule;
 import com.jinhe.tss.um.permission.PermissionHelper;
+import com.jinhe.tss.um.service.ILoginService;
 import com.jinhe.tss.util.EasyUtils;
 
 @Controller
@@ -36,9 +41,17 @@ import com.jinhe.tss.util.EasyUtils;
 public class ReportAction extends BaseActionSupport {
     
     @Autowired private ReportService reportService;
+    @Autowired private ILoginService loginService;
     
     @RequestMapping("/all")
     public void getAllReport(HttpServletResponse response) {
+	    // add 2014.12.17 检查用户的密码强度，太弱的话强制要求修改密码
+		IOperator operator = loginService.getOperatorDTOByID(Environment.getOperatorId());
+		Object strengthLevel = operator.getAttributesMap().get("passwordStrength");
+		if(strengthLevel != null && EasyUtils.obj2Int(strengthLevel) <= PasswordRule.LOW_LEVEL) {
+			throw new BusinessException("您的密码过于简单，请点右上角【修改密码】菜单重置密码后，再进行访问！");
+		}
+    	
         List<?> list = reportService.getAllReport();
         TreeEncoder treeEncoder = new TreeEncoder(list, new StrictLevelTreeParser(Report.DEFAULT_PARENT_ID));
         print("SourceTree", treeEncoder);
@@ -72,13 +85,13 @@ public class ReportAction extends BaseActionSupport {
             	parentIdValue = null;
             }
             
-            Long parentId = parentIdValue == null ? Report.DEFAULT_PARENT_ID : EasyUtils.convertObject2Long(parentIdValue);
+            Long parentId = parentIdValue == null ? Report.DEFAULT_PARENT_ID : EasyUtils.obj2Long(parentIdValue);
             map.put("parentId", parentId);
             map.put("type", type);
             xformEncoder = new XFormEncoder(uri, map);
         } 
         else {
-            Long reportId = EasyUtils.convertObject2Long(reportIdValue);
+            Long reportId = EasyUtils.obj2Long(reportIdValue);
             Report report = reportService.getReport(reportId);
             xformEncoder = new XFormEncoder(uri, report);
         }

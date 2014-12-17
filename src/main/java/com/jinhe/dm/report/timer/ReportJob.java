@@ -36,7 +36,7 @@ public class ReportJob extends AbstractJob {
 		
 		for(int i = 0; i < jobConfigs.length; i++) {
 			String reportInfo[] = EasyUtils.split(jobConfigs[i], ":");
-			Long reportId = EasyUtils.convertObject2Long(reportInfo[0]);
+			Long reportId = EasyUtils.obj2Long(reportInfo[0]);
 			String title = reportInfo[1];
 			String receiver[] = getEmails( reportInfo[2].trim().split(",") );
 					

@@ -36,7 +36,7 @@ public class BaseServiceImpl implements BaseService {
 		}
 
 		Map<String, Object> row = excutor.result.get(0);
-		Long userId = EasyUtils.convertObject2Long(row.get("id"));
+		Long userId = EasyUtils.obj2Long(row.get("id"));
 		HttpSession session = Context.getRequestContext().getRequest().getSession();
 		session.setAttribute("BTR-USERID", userId);
 		

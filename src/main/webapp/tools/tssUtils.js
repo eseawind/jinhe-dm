@@ -669,6 +669,7 @@ function checkPasswordSecurityLevel(formObj, url, password, loginName) {
 				3: "您输入的密码安全等级为高，很安全。"
 			};
 			formObj.showCustomErrorInfo("password", errorInfo[securityLevel]);
+			formObj.securityLevel = securityLevel;
 		}
 	});
 }

@@ -1,5 +1,6 @@
 package com.jinhe.dm.report;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,9 +46,15 @@ public class Display extends BaseActionSupport {
     	Map<String, String[]> parameterMap = request.getParameterMap();
     	Map<String, String> requestMap = new HashMap<String, String>();
     	for(String key : parameterMap.keySet()) {
-    		String[] value = parameterMap.get(key);
-    		if(value != null && value.length > 0) {
-    			requestMap.put(key, value[0]);
+    		String[] values = parameterMap.get(key);
+    		if(values != null && values.length > 0) {
+    			String value;
+				try {
+					value = new String(values[0].getBytes("ISO-8859-1"), "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					value = values[0];
+				}
+    			requestMap.put( key, value );
     		}
     	}
     	

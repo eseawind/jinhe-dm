@@ -42,18 +42,24 @@ public class Display extends BaseActionSupport {
     
     @Autowired private ReportService reportService;
     
-    private Map<String, String> getRequestMap(HttpServletRequest request) {
+    private Map<String, String> getRequestMap(HttpServletRequest request, boolean isGet) {
     	Map<String, String[]> parameterMap = request.getParameterMap();
     	Map<String, String> requestMap = new HashMap<String, String>();
     	for(String key : parameterMap.keySet()) {
     		String[] values = parameterMap.get(key);
     		if(values != null && values.length > 0) {
     			String value;
-				try {
-					value = new String(values[0].getBytes("ISO-8859-1"), "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					value = values[0];
-				}
+    			if(isGet) {
+    				try {
+    					value = new String(values[0].getBytes("ISO-8859-1"), "UTF-8");
+    				} catch (UnsupportedEncodingException e) {
+    					value = values[0];
+    				}
+    			}
+    			else {
+    				value = values[0];
+    			}
+				
     			requestMap.put( key, value );
     		}
     	}
@@ -72,7 +78,7 @@ public class Display extends BaseActionSupport {
             @PathVariable("pagesize") int pagesize) {
     	
     	long start = System.currentTimeMillis();
-    	Map<String, String> requestMap = getRequestMap(request);
+    	Map<String, String> requestMap = getRequestMap(request, false);
 		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId());
     	
     	outputAccessLog(reportId, "showAsGrid", requestMap, start);
@@ -100,7 +106,7 @@ public class Display extends BaseActionSupport {
             @PathVariable("pagesize") int pagesize) {
         
     	long start = System.currentTimeMillis();
-    	Map<String, String> requestMap = getRequestMap(request);
+    	Map<String, String> requestMap = getRequestMap(request, true);
 		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId());
 		
 		String fileName = reportId + "-" + System.currentTimeMillis() + ".csv";
@@ -142,7 +148,7 @@ public class Display extends BaseActionSupport {
     	}
     	
     	long start = System.currentTimeMillis();
-    	Map<String, String> requestMap = getRequestMap(request);
+    	Map<String, String> requestMap = getRequestMap(request, false);
         SQLExcutor excutor = reportService.queryReport(reportId, requestMap, 0, 0, getLoginUserId());
         
         outputAccessLog(reportId, "showAsJson", requestMap, start);

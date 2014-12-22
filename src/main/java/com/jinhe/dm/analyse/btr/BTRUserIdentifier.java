@@ -3,14 +3,9 @@ package com.jinhe.dm.analyse.btr;
 import org.apache.log4j.Logger;
 
 import com.jinhe.tss.framework.Global;
-import com.jinhe.tss.framework.exception.BusinessException;
-import com.jinhe.tss.framework.exception.UserIdentificationException;
-import com.jinhe.tss.framework.sso.IOperator;
 import com.jinhe.tss.framework.sso.IPWDOperator;
-import com.jinhe.tss.framework.sso.PasswordPassport;
-import com.jinhe.tss.framework.sso.identifier.BaseUserIdentifier;
 import com.jinhe.tss.um.service.ILoginService;
-import com.jinhe.tss.util.InfoEncoder;
+import com.jinhe.tss.um.sso.UMPasswordIdentifier;
 
 /**
  * <p>
@@ -18,38 +13,15 @@ import com.jinhe.tss.util.InfoEncoder;
  * 根据用户帐号、密码等信息，通过UM本地数据库进行身份认证
  * </p>
  */
-public class BTRUserIdentifier extends BaseUserIdentifier {
+public class BTRUserIdentifier extends UMPasswordIdentifier {
     
     protected Logger log = Logger.getLogger(this.getClass());
     
     ILoginService loginservice = (ILoginService) Global.getBean("LoginService");
     
-    protected IOperator validate() throws UserIdentificationException {
-        PasswordPassport passport = new PasswordPassport();
-        IPWDOperator operator = null;
-        try {
-            operator = loginservice.getOperatorDTOByLoginName(passport.getLoginName());
-        } catch (BusinessException e) {
-        	throw new BusinessException(e.getMessage(), false);
-        }
+    protected boolean customizeValidate(IPWDOperator operator, String password){
         
-        String password = passport.getPassword();
-		String md5password = InfoEncoder.string2MD5(passport.getLoginName() + "_" + password);
-        if ( !md5password.equals(operator.getPassword()) && !checkPWDInBTR(operator, password)) {
-        	throw new BusinessException("用户密码不正确，请重新登录", false);
-        }
-        
-        try {
-        	// 设置一下密码强度，同时也可以将第三方的密码设置到UM中
-        	loginservice.resetPassword(operator.getId(), password); 
-    	} catch(Exception e) {
-    		log.error("resetPassword时出错了：" + e.getMessage());
-    	}
-        return operator;
-    }
-    
-    boolean checkPWDInBTR(IPWDOperator operator, String password){
-        log.debug("用户登陆时密码在主用户组中验证不通过，转向进行再次验证。");
+    	log.debug("用户登陆时密码在TSS的主用户组中验证不通过，转向V5进行再次验证。");
         
         BaseService btrService = (BaseService) Global.getBean("BaseService");
         

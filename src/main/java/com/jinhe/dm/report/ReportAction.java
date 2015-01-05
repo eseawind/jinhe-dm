@@ -46,9 +46,15 @@ public class ReportAction extends BaseActionSupport {
     @RequestMapping("/all")
     public void getAllReport(HttpServletResponse response) {
 	    // add 2014.12.17 检查用户的密码强度，太弱的话强制要求修改密码
-		IOperator operator = loginService.getOperatorDTOByID(Environment.getOperatorId());
-		Object strengthLevel = operator.getAttributesMap().get("passwordStrength");
-		if(strengthLevel != null && EasyUtils.obj2Int(strengthLevel) <= PasswordRule.LOW_LEVEL) {
+    	Object strengthLevel = null;
+    	try {
+    		Long operatorId = Environment.getOperatorId();
+			IOperator operator = loginService.getOperatorDTOByID(operatorId);
+			strengthLevel = operator.getAttributesMap().get("passwordStrength");
+    	} catch(Exception e) {
+    		// do nothing
+    	}
+    	if(strengthLevel != null && EasyUtils.obj2Int(strengthLevel) <= PasswordRule.LOW_LEVEL) {
 			throw new BusinessException("您的密码过于简单，请点右上角【修改密码】菜单重置密码后，再进行访问！");
 		}
     	

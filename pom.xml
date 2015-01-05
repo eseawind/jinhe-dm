@@ -6,13 +6,13 @@
 	<groupId>DMS</groupId>
 	<artifactId>dms</artifactId>
 	<packaging>war</packaging>
-	<version>2.0</version>
-	<name>DataMining</name>
+	<version>3.0</version>
+	<name>DataMining Platform</name>
 	<url>http://dms.llrs.com</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tss.version>2.2.0</tss.version>
+		<tss.version>3.0.0</tss.version>
 		<spring.version>3.2.0.RELEASE</spring.version>
 		<hibernate.version>3.5.1-Final</hibernate.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.7</version>
+			<version>1.8</version>
 		</dependency>
 		
 		<dependency>
@@ -421,14 +421,14 @@
 			</plugin>
 			
 			<!-- 
-			mvn install:install-file -DgroupId=com.jinhe.dm -DartifactId=dm -Dversion=2.0 -Dpackaging=jar -Dfile=D:/project/TSS/jinhe-dm/target/dm-2.0.jar
+			mvn install:install-file -DgroupId=com.jinhe.dm -DartifactId=dm -Dversion=3.0 -Dpackaging=jar -Dfile=D:/project/TSS/jinhe-dm/target/dm-3.0.jar
 			-->
 			<!-- mvn clean compile assembly:single -->
 			<plugin>
 				<artifactId> maven-assembly-plugin </artifactId>
 				<version>2.4</version>
 				<configuration >
-					<finalName>dm-${version}</finalName>
+					<finalName>dm-${project.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptors>
 						<descriptor>src/main/assembly/package.xml</descriptor>
@@ -449,6 +449,22 @@
 	</build>
 
 	<profiles>
+		<!-- eg: mvn clean install  -Pxxx -Dmaven.test.skip=true -->
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<environment>dev</environment>
+				<job.enable>true</job.enable>
+				<log.level>debug</log.level>
+				<db.url>127.0.0.1:3306/dms</db.url>
+				<tomcat.url>localhost:8088</tomcat.url>
+			</properties>
+		</profile>
+		
+		<!-- for btrBI -->
 		<profile>
 			<id>prod</id>
 			<activation>
@@ -488,19 +504,7 @@
 				<tomcat.url>bl00618-l</tomcat.url>
 			</properties>
 		</profile>
-		<profile>
-			<id>dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<environment>dev</environment>
-				<job.enable>true</job.enable>
-				<log.level>debug</log.level>
-				<db.url>127.0.0.1:3306/dms_btr</db.url>
-				<tomcat.url>localhost:8088</tomcat.url>
-			</properties>
-		</profile>
+		
 	</profiles>
 
 	<reporting>

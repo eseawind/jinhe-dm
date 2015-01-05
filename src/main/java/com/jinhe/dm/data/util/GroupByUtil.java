@@ -21,7 +21,7 @@ public class GroupByUtil {
      */
     @SuppressWarnings("unchecked")
 	public static Map<String, ?> getSum(List<?> voList, String field, String...dimensions) {
-    	if (EasyUtils.isNullOrEmpty(voList)) {
+    	if(EasyUtils.isNullOrEmpty(voList)) {
             return new HashMap<String, Object>();
         }
     	if(dimensions == null || dimensions.length < 1) {
@@ -122,6 +122,10 @@ public class GroupByUtil {
         	for( int i = 0; i < keys.length - 2; i++) {
             	String key = keys[i];
         		sonMap = (Map<String, Object>) sonMap.get(key);
+        		
+        		if(sonMap == null) {
+        			sonMap = new HashMap<String, Object>();
+        		}
         	}
         	
         	String lastKey = keys[keys.length - 2];

@@ -71,7 +71,7 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
         log.info("init dm databse over.");
     }
     
-    static String PROJECT_NAME = "DM";
+    static String PROJECT_NAME = "jinhe-dm";
     static String PACKAGE = "com/jinhe/dm";
     static String getInitSQLDir() {
         String path = URLUtil.getResourceFileUrl(PACKAGE).getPath();
@@ -98,7 +98,7 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
         
         // 应用服务配置
         Param paramGroup = addParam(ParamConstants.DEFAULT_PARENT_ID, "应用服务配置");
-        Document doc = XMLDocUtil.createDoc("appServers.xml");
+        Document doc = XMLDocUtil.createDoc("tss/appServers.xml");
         List<?> elements = doc.getRootElement().elements();
         for (Iterator<?> it = elements.iterator(); it.hasNext();) {
             org.dom4j.Element element = (org.dom4j.Element) it.next();
@@ -108,10 +108,10 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
         }
         
         // 数据源配置
-        addParam(group.getId(), Constants.DEFAULT_CONN_POOL, "默认数据源", "connpool-vf-oracle");
+        addParam(group.getId(), Constants.DEFAULT_CONN_POOL, "默认数据源", "connectionpool");
         
         Param dlParam = addParamGroup(group.getId(), Constants.DATASOURCE_LIST, "数据源列表");
-        addParamItem(dlParam.getId(), "connectionpool-1", "数据源1", ParamConstants.COMBO_PARAM_MODE);
+        addParamItem(dlParam.getId(), "connectionpool", "本地数据源", ParamConstants.COMBO_PARAM_MODE);
     }
 
     /** 建参数组 */

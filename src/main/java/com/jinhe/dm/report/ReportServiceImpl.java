@@ -18,6 +18,7 @@ import com.jinhe.dm.data.sqlquery.SQLExcutor;
 import com.jinhe.dm.data.util._DateUtil;
 import com.jinhe.tss.framework.component.param.ParamConstants;
 import com.jinhe.tss.framework.exception.BusinessException;
+import com.jinhe.tss.framework.sso.Environment;
 import com.jinhe.tss.util.DateUtil;
 import com.jinhe.tss.util.EasyUtils;
 
@@ -133,6 +134,10 @@ public class ReportServiceImpl implements ReportService {
 		Report report = this.getReport(reportId);
 		String paramsConfig = report.getParam();
 		String reportScript = report.getScript();
+		
+		if( EasyUtils.isNullOrEmpty(reportScript) ) {
+			throw new BusinessException("报表【" + report.getName() + "】的脚本没有任何内容，无法查询。");
+		}
           
       	Map<Integer, Object> paramsMap = new HashMap<Integer, Object>();
       	Map<String, Object> fmDataMap = new HashMap<String, Object>();
@@ -191,6 +196,13 @@ public class ReportServiceImpl implements ReportService {
   	        }
       	}
       	
+      	// 加入登陆用户的信息
+      	fmDataMap.put("userId", loginUserId);
+		Object fromUserId = Environment.getOperatorInfo("fromUserId");
+		if (fromUserId != null) {
+			fmDataMap.put("fromUserId", fromUserId);
+		}
+      	
         // 结合 requestMap 进行 freemarker解析 sql，允许指定sql预处理类。
       	ScriptPreCheator scriptPreCheator = ScriptPreCheatorFactory.getPreCheator();
       	if(scriptPreCheator == null) {
@@ -224,7 +236,7 @@ public class ReportServiceImpl implements ReportService {
 				Date dateObj = DateUtil.parse(paramValue);
 				return new java.sql.Timestamp(dateObj.getTime());
 			} catch(Exception e) {
-				logger.error("Date type param'value is wrong: " + e.getMessage());
+				logger.error("Date type param'value【" + paramValue + "】  is wrong. " + e.getMessage());
 				return null;
 			}
   		}

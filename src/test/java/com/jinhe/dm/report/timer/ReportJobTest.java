@@ -18,7 +18,7 @@ public class ReportJobTest extends TxTestSupport {
         report1.setParentId(Report.DEFAULT_PARENT_ID);
         report1.setName("report-job-test");
         report1.setScript(" select id, name from dm_report " +
-        		" where id > ? <#if param2??> and type <> ? <#else> and type = 1 </#if>" +
+        		" where id > ? <#if param2??> and type <> ${param2} <#else> and type = 1 </#if>" +
         		"	and createTime > ?");
         
         String paramsConfig = 

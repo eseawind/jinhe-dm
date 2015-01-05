@@ -811,14 +811,14 @@ function popupTree(url, nodeName, params, callback) {
 	removeDialog();
 
 	var boxName = "popupTree";
-	var el = $.createElement("div", "dialog");
+	var el = $.createElement("div", "popupItem");
 	el.innerHTML = '<Tree:Box id="' + boxName + '"><div class="loading"></div></Tree:Box>' + 
 	    '<div class="bts">' + 
 	       '<input type="button" value="确定" class="btStrong" onclick="doCallback()"/>' + 
        	   '<input type="button" value="关闭" class="btWeak" onclick="$.removeNode(el)"/>' +  
 	    '</div>';
 	document.body.appendChild(el);
-	$(el).center(300, 300).css("width", "300px").css("height", "300px").css("zIndex", "10001");
+	$(el).addClass("dialog").center(300, 300).css("width", "300px").css("height", "300px").css("zIndex", "10001");
 
 	$(".bts .btWeak", el).click(removeDialog);
 
@@ -851,7 +851,7 @@ function popupForm(url, nodeName, params, callback, title) {
 	removeDialog();
 
 	var boxName = "popupForm";
-	var el = $.createElement("div", "dialog");
+	var el = $.createElement("div", "popupItem");
 	el.innerHTML = '<h2>' + title + '</h2>' +
 		'<Form:Box id="' + boxName + '"><div class="loading"></div></Form:Box>' + 
 	    '<div class="bts">' + 
@@ -859,7 +859,7 @@ function popupForm(url, nodeName, params, callback, title) {
        	   '<input type="button" value="关闭" class="btWeak"/>' +  
 	    '</div>';
 	document.body.appendChild(el);
-	$(el).center(300, 300).css("zIndex", "10001");
+	$(el).addClass("dialog").center(300, 300).css("zIndex", "10001");
 
 	$(".bts .btWeak", el).click(removeDialog);
 
@@ -900,8 +900,8 @@ function popupForm(url, nodeName, params, callback, title) {
 }
 
 function removeDialog() {
-	if($(".dialog").length > 0) {
-		$(".dialog").each(function(i, el){
+	if($(".popupItem").length > 0) {
+		$(".popupItem").each(function(i, el){
 			$.removeNode(el);
 			$.hideWaitingLayer();
 		}); 
@@ -911,14 +911,14 @@ function removeDialog() {
 function popupGrid(url, nodeName, title, params) {
 	removeDialog();
 	var boxName = "popupGrid";
-	var el = $.createElement("div", "dialog");
+	var el = $.createElement("div", "popupItem");
 	el.innerHTML = '<h2>' + title + '</h2>' +
 		'<Grid:Box id="' + boxName + '"><div class="loading"></div></Grid:Box>' + 
 	    '<div class="bts">' + 
        	   '<input type="button" value="关闭" class="btWeak"/>' +  
 	    '</div>';
 	document.body.appendChild(el);
-	$(el).center(600, 400).css("width", "600px").css("height", "auto");
+	$(el).addClass("dialog").center(600, 400).css("width", "600px").css("height", "auto");
 	$("#" + boxName, el).css("minHeight", "200px").css("maxHeight", "400px");
 
 	$(".bts .btWeak", el).click(removeDialog);

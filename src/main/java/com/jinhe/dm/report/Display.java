@@ -68,7 +68,7 @@ public class Display extends BaseActionSupport {
     }
     
     private Object getLoginUserId() {
-        return Environment.getOperatorId();
+        return Environment.getUserId();
     }
  
     @RequestMapping("/{reportId}/{page}/{pagesize}")
@@ -196,7 +196,7 @@ public class Display extends BaseActionSupport {
             log.setAccessTime(new Date(start));
             log.setRunningTime(runningTime);
             log.setParams(params);
-            log.setUserId(Environment.getOperatorId());
+            log.setUserId(Environment.getUserId());
 
             AccessLogRecorder.getInstanse().output(log);
         } 

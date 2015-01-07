@@ -48,7 +48,7 @@ public class ReportAction extends BaseActionSupport {
 	    // add 2014.12.17 检查用户的密码强度，太弱的话强制要求修改密码
     	Object strengthLevel = null;
     	try {
-    		Long operatorId = Environment.getOperatorId();
+    		Long operatorId = Environment.getUserId();
 			IOperator operator = loginService.getOperatorDTOByID(operatorId);
 			strengthLevel = operator.getAttributesMap().get("passwordStrength");
     	} catch(Exception e) {

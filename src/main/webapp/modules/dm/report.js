@@ -698,7 +698,7 @@ function closeConfigParams() {
 	$("#reportParamsDiv").hide();
 }
 
-var REPORT_PARAM_FIELDS = ['label', 'type', 'nullable', 'defaultValue', 'checkReg', 'width', 'height', 'options', 'multiple', 'onChange', 'isMacrocode'];
+var REPORT_PARAM_FIELDS = ['label', 'type', 'nullable', 'defaultValue', 'checkReg', 'width', 'height', 'options', 'multiple', 'onchange', 'isMacrocode'];
 
 function editParamConfig() {
 	var paramTree = $.T("paramTree");
@@ -813,6 +813,13 @@ function saveConfigParams() {
 
 // ------------------------------------------------- 多级下拉选择联动 ------------------------------------------------
 
+/*
+ *  多级下拉选择联动
+ *  参数： nextIndex       下一级联动参数的序号（1->n）
+        serviceID       下一级联动的service地址             
+        currParam       当前联动参数的序号
+        currParamValue  当前联动参数的值
+ */
 function getNextLevelOption(nextIndex, serviceID, currParam, currParamValue) {
 	if(nextIndex == null || serviceID == null || currParam == null || $.isNullOrEmpty(currParamValue)) return;
 

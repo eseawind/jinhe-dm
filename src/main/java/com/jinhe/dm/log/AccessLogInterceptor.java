@@ -58,7 +58,7 @@ public class AccessLogInterceptor implements MethodInterceptor {
             log.setAccessTime(new Date(start));
             log.setRunningTime(runningTime);
             log.setParams(params);
-            log.setUserId(Environment.getOperatorId());
+            log.setUserId(Environment.getUserId());
             log.setIp(Environment.getClientIp());
 
             AccessLogRecorder.getInstanse().output(log);

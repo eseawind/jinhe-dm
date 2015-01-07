@@ -198,7 +198,8 @@ public class ReportServiceImpl implements ReportService {
       	
       	// 加入登陆用户的信息
       	fmDataMap.put("userId", loginUserId);
-		Object fromUserId = Environment.getOperatorInfo("fromUserId");
+      	fmDataMap.put("userCode", Environment.getUserCode());
+		Object fromUserId = Environment.getUserInfo("fromUserId");
 		if (fromUserId != null) {
 			fmDataMap.put("fromUserId", fromUserId);
 		}

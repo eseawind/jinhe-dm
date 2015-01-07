@@ -24,7 +24,7 @@ public class BTRAfterLoginCustomizer implements ILoginCustomizer {
     
     public void execute() {
         // 获取登陆用户所在父组
-    	Long logonUserId = Environment.getOperatorId();
+    	Long logonUserId = Environment.getUserId();
         List<Object[]> fatherGroups = loginSerivce.getGroupsByUserId(logonUserId);
         List<Long> fatherGroupIds = new ArrayList<Long>();
         List<String> fatherGroupNames = new ArrayList<String>();	

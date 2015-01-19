@@ -73,6 +73,7 @@ public class ReportJob extends AbstractJob {
 			String temp = receiver[j];
 			
 			// 判断配置的是否已经是email，如不是，做loginName处理
+			// TODO 增强，能发给用户组、辅助组 或 角色
 			if(temp.indexOf("@") < 0) {
 				try {
 					OperatorDTO user = loginService.getOperatorDTOByLoginName(temp);

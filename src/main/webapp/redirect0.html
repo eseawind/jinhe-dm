@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD></HEAD>
+
+<BODY>
+	<SCRIPT LANGUAGE="JavaScript">
+	<!--
+		var queryString = location.search.substring(1);
+		var _params = {};
+		if(queryString && queryString.length > 0) {
+			var keyValues = queryString.split("&");
+			for(var i = 0; i < keyValues.length; i++) {
+				var curName  = keyValues[i].split("=")[0].replace(/^ /gi,"");
+				var curValue = keyValues[i].replace(keyValues[i].split("=")[0] + "=", "");
+				_params[curName] = unescape(curValue);
+			}
+		}
+
+		var token = _params["token"];
+		if(token && token != "null") {
+			document.cookie = "token=" + token;
+		}
+
+		var url = _params["url"];
+		if(url) {
+			document.location = url;
+		}
+	//-->
+	</SCRIPT>
+</BODY>
+</HTML>

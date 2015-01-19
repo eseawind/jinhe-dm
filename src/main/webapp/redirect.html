@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <HTML>
-<HEAD></HEAD>
+<HEAD>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/> 
+	<meta charset="UTF-8">
+	<script src="tools/tssJS/tssJS.all.js"></script>
+	<script src="tools/tssUtils.js"></script>
+
+</HEAD>
 
 <BODY>
 	<SCRIPT LANGUAGE="JavaScript">
@@ -10,21 +16,45 @@
 		if(queryString && queryString.length > 0) {
 			var keyValues = queryString.split("&");
 			for(var i = 0; i < keyValues.length; i++) {
-				var curName  = keyValues[i].split("=")[0].replace(/^ /gi,"");
-				var curValue = keyValues[i].replace(keyValues[i].split("=")[0] + "=", "");
+			    // 注意: token值里也可能含有等号
+				var beaforeEqualSign = keyValues[i].split("=")[0];
+				var curName  = beaforeEqualSign.replace(/^ /gi, "");
+				var curValue = keyValues[i].replace(beaforeEqualSign + "=", "");
 				_params[curName] = unescape(curValue);
 			}
 		}
 
-		var token = _params["token"];
-		if(token && token != "null") {
-			document.cookie = "token=" + token;
-		}
-
 		var url = _params["url"];
 		if(url) {
-			document.location = url;
+
+			var token = _params["token"];
+			if( token && token != "null" ) { 
+				// 判断是否已经单点登录当前应用了
+				if($.Cookie.getValue("token") === token ) {
+					document.location = url;
+				}
+
+				// 非IE浏览器（chrome、FF等）可直接跳转，iframe里能写cookie
+				if( !$.isIE ) {
+				    document.cookie = "token=" + token;
+					document.location = url;
+				}
+				else { // 直接用token在当前系统进行登录
+					$.ajax({
+						url: AUTH_PATH + "login.do",
+						headers: { "token": token.replace(/\"/g, '') },
+						onexception: function(errorMsg) {
+							// document.location = url;
+						},
+						onsuccess: function() {
+							// _alert(1);
+							document.location = url;
+						}
+					});
+				}
+			}
 		}
+
 	//-->
 	</SCRIPT>
 </BODY>

@@ -113,7 +113,7 @@ public class GroupByUtil {
             valuesSet.add(value);
         }
         
-        for(String keyPath : keyPathSet) {
+        L: for(String keyPath : keyPathSet) {
         	// 默认加一个",end"，防止keypath最后一个值为空字符串
         	String[] keys = (keyPath + ",end").split(",");
         	
@@ -124,7 +124,7 @@ public class GroupByUtil {
         		sonMap = (Map<String, Object>) sonMap.get(key);
         		
         		if(sonMap == null) {
-        			sonMap = new HashMap<String, Object>();
+        			continue L;
         		}
         	}
         	

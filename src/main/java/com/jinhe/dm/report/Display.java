@@ -67,7 +67,10 @@ public class Display extends BaseActionSupport {
     	return requestMap;
     }
     
-    private Object getLoginUserId() {
+    private Object getLoginUserId(Map<String, String> requestMap) {
+    	if(requestMap.containsKey("noCache")) {
+    		return System.currentTimeMillis(); // 如果传入的参数要求不取缓存的数据，则返回当前时间戳作为userID，以触发缓存更新。
+    	}
         return Environment.getUserId();
     }
  
@@ -79,7 +82,7 @@ public class Display extends BaseActionSupport {
     	
     	long start = System.currentTimeMillis();
     	Map<String, String> requestMap = getRequestMap(request, false);
-		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId());
+		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId(requestMap));
     	
     	outputAccessLog(reportId, "showAsGrid", requestMap, start);
         
@@ -107,7 +110,7 @@ public class Display extends BaseActionSupport {
         
     	long start = System.currentTimeMillis();
     	Map<String, String> requestMap = getRequestMap(request, true);
-		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId());
+		SQLExcutor excutor = reportService.queryReport(reportId, requestMap, page, pagesize, getLoginUserId(requestMap));
 		
 		String fileName = reportId + "-" + System.currentTimeMillis() + ".csv";
         String exportPath = ParamManager.getValue(Constants.TEMP_EXPORT_PATH).replace("\n", "") + "/" + fileName;
@@ -149,7 +152,7 @@ public class Display extends BaseActionSupport {
     	
     	long start = System.currentTimeMillis();
     	Map<String, String> requestMap = getRequestMap(request, false);
-        SQLExcutor excutor = reportService.queryReport(reportId, requestMap, 0, 0, getLoginUserId());
+        SQLExcutor excutor = reportService.queryReport(reportId, requestMap, 0, 0, getLoginUserId(requestMap));
         
         outputAccessLog(reportId, "showAsJson", requestMap, start);
         

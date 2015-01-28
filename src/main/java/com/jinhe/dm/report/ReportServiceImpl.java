@@ -180,6 +180,11 @@ public class ReportServiceImpl implements ReportService {
 					Date today = _DateUtil.noHMS(new Date());
 					paramValue = DateUtil.format(_DateUtil.subDays(today, deltaDays));
 				} 
+				if (Pattern.compile("^today[\\s]*+[\\s]*\\d{1,4}").matcher(paramValue).matches()) {
+					int deltaDays = Integer.parseInt(paramValue.split("+")[1].trim());
+					Date today = _DateUtil.noHMS(new Date());
+					paramValue = DateUtil.format(_DateUtil.subDays(today, deltaDays));
+				} 
 
 				if (reportScript.indexOf("in (${" + paramKy + "})") > 0 ||
 						reportScript.indexOf("IN (${" + paramKy + "})") > 0) {

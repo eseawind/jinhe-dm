@@ -129,6 +129,18 @@ public class ReportAction extends BaseActionSupport {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public void delete(HttpServletResponse response, @PathVariable("id") Long id) {
         reportService.delete(id);
+        
+        // 删除定时JOB，如果有的话
+        String jobCode = "ReportJob-" + id;
+		List<Param> jobParamItems = paramService.getParamsByParentCode(SchedulerBean.TIMER_PARAM_CODE);
+		if(jobParamItems != null) {
+			for(Param temp : jobParamItems) {
+				if(jobCode.equals(temp.getDescription())) {
+					paramService.delete(temp.getId());
+				}
+			}
+		}
+		
         printSuccessMessage();
     }
 

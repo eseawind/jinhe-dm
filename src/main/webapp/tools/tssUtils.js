@@ -445,7 +445,7 @@ function modifyTreeNode(id, attrName, attrValue, treeName) {
 	if( treeNode ) {
 		treeNode.attrs[attrName] = attrValue;
 		if(attrName == "name") {
-			treeNode.li.a.title = attrValue;
+			treeNode.name = treeNode.li.a.title = attrValue;
 			$(treeNode.li.a).html(attrValue);
 		}
 	}

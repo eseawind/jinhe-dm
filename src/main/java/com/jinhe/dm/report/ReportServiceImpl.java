@@ -174,12 +174,19 @@ public class ReportServiceImpl implements ReportService {
 					isMacrocode = "true";		
 				}
 				
+				// 隐藏类型的参数
+				if("hidden".equals(paramType)) {
+					isMacrocode = "true";
+		  		}
+				
 				// 将相对时间解析成绝对时间（today - 2 --> 2014-7-20）
 				if (Pattern.compile("^today[\\s]*-[\\s]*\\d{1,4}").matcher(paramValue).matches()) {
 					int deltaDays = Integer.parseInt(paramValue.split("-")[1].trim());
 					Date today = _DateUtil.noHMS(new Date());
 					paramValue = DateUtil.format(_DateUtil.subDays(today, deltaDays));
 				} 
+				
+				// 将相对时间解析成绝对时间（today + 2 --> 2014-7-24）
 				if (Pattern.compile("^today[\\s]*+[\\s]*\\d{1,4}").matcher(paramValue).matches()) {
 					int deltaDays = Integer.parseInt(paramValue.split("+")[1].trim());
 					Date today = _DateUtil.noHMS(new Date());

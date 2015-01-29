@@ -5,8 +5,8 @@
 		// item的类型允许为[id, code, name] or [pk, id, text]
 		createOption = function(item) {
 			var option = new Option();
-			option.value = item.id   || item.pk   || item[0];
-			option.text  = item.name || item.text || item[2];
+			option.value = item.id   || item.pk   || item[0] || '';
+			option.text  = item.name || item.text || item[2] || '';
 			return option;
 		},
 
@@ -37,6 +37,7 @@
 				this.checkReg = this.checkReg || "/^[0-9]*[1-9][0-9]*$/";
 				break;
 			case "string":
+			case "hidden":
 				break;
 			case "date":
 			case "datetime":
@@ -68,6 +69,10 @@
 				column += " height='" + this.height + "' ";
 			}
 
+			// 如果下拉列表需要后续生成，可先填入任意值，默认初始化成为codes和names都为空
+			if(this.options && this.options.codes == undefined) {
+				this.options = {"codes": "", "names": ""};
+			}
 			if(this.options) {
 				if (this.options.codes == "year") {
 					this.options.codes = '2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020';
@@ -108,7 +113,7 @@
 			return column + "/>";
 		},
 
-		createLayout: function() {
+		createLayout: function() {			
 			var layout = [];
 			layout[layout.length] = " <TR>";
 			layout[layout.length] = "    <TD width='88'><label binding='" + this.name + "'/></TD>";
@@ -136,7 +141,9 @@
 			info.name = info.name || "param" + (i+1);
 			var item = new Field(info);
 			columns.push(item.createColumn());
-			layouts.push(item.createLayout());
+			if(item.mode !== "hidden") {
+				layouts.push(item.createLayout());
+			}
 			datarow.push(item.createDataNode());
 		});
 		

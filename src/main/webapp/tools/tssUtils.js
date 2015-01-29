@@ -400,7 +400,7 @@ function getActiveTreeNode(treeName) {
 }
 
 function getTreeAttribute(name, treeName) {
-	var treeNode = getActiveTreeNode();
+	var treeNode = getActiveTreeNode(treeName);
 	if( treeNode ) {
 		return treeNode.getAttribute(name);
 	}

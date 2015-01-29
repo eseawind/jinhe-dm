@@ -786,8 +786,10 @@ function editParamConfig() {
     			}
     		}
     		if(field === 'type') {
-    			if(newValue == "date" || newValue == "datetime") {
-    				$1("_defaultValue").setAttribute("placeholder", "日期类型示例：today-3");
+    			if(newValue == "date" || newValue == "datetime" || newValue == "hidden") {
+    				if(newValue != "hidden") {
+    					$1("_defaultValue").setAttribute("placeholder", "日期类型示例：today-3");
+    				}
 					$("#selectRelation").css("display", "none");
     			}
 				else {
@@ -812,10 +814,9 @@ function saveConfigParams() {
 }
 
 // ------------------------------------------------- 多级下拉选择联动 ------------------------------------------------
-
 /*
  *  多级下拉选择联动
- *  参数： nextIndex       下一级联动参数的序号（1->n）
+ *  参数： nextIndex    下一级联动参数的序号（1->n）
         serviceID       下一级联动的service地址             
         currParam       当前联动参数的序号
         currParamValue  当前联动参数的值

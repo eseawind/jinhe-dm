@@ -316,6 +316,8 @@ function showReportInPointUrl(treeID, displayUri) {
 	$("#grid").hide();
 	$("#chatFrame").show();
 	$1("chatFrame").setAttribute("src", url);
+	
+	$("#gridToolBar").html("");
 }
 
 var globalValiable = {}; // 用来存放传递给iframe页面的信息

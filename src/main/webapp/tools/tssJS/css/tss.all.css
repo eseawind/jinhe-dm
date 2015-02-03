@@ -88,7 +88,7 @@ input[type=text]:focus, textarea:focus {
 
 Form\:Box { width:100%; display:block; font-size:12px; } 
 Form\:Box .tssForm table { width: 100%; border-width:0px 0px 0px 0px;}
-Form\:Box .tssForm td { padding:2px 2px; border-width:0px; }
+Form\:Box .tssForm td { padding:3px 2px; border-width:0px; }
 Form\:Box input, Form\:Box textarea { color:#535458; font-size:12px; border:1px solid #ABAAAF; background-color:#ECEFF8; }
 Form\:Box input { height:18px; }
 Form\:Box textarea { word-break:break-all; }

@@ -680,7 +680,7 @@ Element.show = function(element, opacity) {
 		element.style.display = "block"; 
 		element.style.position = "absolute";  
 		element.style.left = "18%";   
-		element.style.top  = "70px";    
+		element.style.top  = "50px";    
 		element.style.zIndex = "999"; 
 	
 		$.setOpacity(element, opacity || 95);
